@@ -14,6 +14,9 @@ class MainMenuScene extends Phaser.Scene {
     
     // UI管理器
     this.uiManager = null;
+    
+    // 背景音乐（现在由GameManager统一管理）
+    // this.menuMusic = null; // 已移除，使用GameManager管理
   }
 
   preload() {
@@ -41,9 +44,13 @@ class MainMenuScene extends Phaser.Scene {
   create() {
     // 创建阶段：设置场景中的所有游戏对象
     
-    // 播放背景音乐（循环播放，音量设为0.5）
-    this.menuMusic = this.sound.add('menu_music', { loop: true, volume: 0.5 });
-    this.menuMusic.play();
+    // 使用GameManager播放背景音乐
+    if (this.game.gameManager) {
+      this.game.gameManager.playSceneBgMusic(this, {
+        key: 'menu_music',
+        volume: 0.5
+      });
+    }
     
     // 添加按钮点击音效并创建1秒的音频标记
     this.buttonSound = this.sound.add('button_click');
@@ -68,14 +75,12 @@ class MainMenuScene extends Phaser.Scene {
     
     // 设置场景切换事件监听
     this.events.on('shutdown', () => {
-      // 场景关闭时停止音乐
-      if (this.menuMusic) {
-        this.menuMusic.stop();
+      // 场景关闭时停止音乐（由GameManager统一管理）
+      if (this.game.gameManager) {
+        this.game.gameManager.stopBgMusic();
       }
     });
   }
-  
-  // 不再需要addButtonHoverEffect方法，因为按钮的悬停效果由MainMenuUI中的createButton方法处理
 }
 
 export default MainMenuScene;

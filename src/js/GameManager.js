@@ -39,7 +39,12 @@ class GameManager {
       lastSaveTime: 0, // 上次保存时间
       currentLocation: 'unknown', // 当前位置
       discoveredLocations: [], // 已发现位置
-      gameFlags: {} // 游戏标志（用于记录游戏进度和事件）
+      gameFlags: {}, // 游戏标志（用于记录游戏进度和事件）
+      resources: {
+        gold: 100,
+        bloodEssence: 50
+      },
+      activeQuest: null // 当前活动任务
     };
     
     // 游戏设置
@@ -49,6 +54,9 @@ class GameManager {
       sfxVolume: 1.0,
       difficulty: 'normal'
     };
+    
+    // 背景音乐管理
+    this.currentBgMusic = null; // 当前播放的背景音乐
     
     // 计时器（用于更新游戏时间）
     this.gameTimer = null;
@@ -148,9 +156,40 @@ class GameManager {
     if (this.player) {
       this.player.skillSystem = this.skillSystem;
       this.player.inventory = this.inventorySystem;
+  }
+  }
+  
+  /**
+   * 设置当前活动任务
+   * @param {Object} quest - 任务对象
+   */
+  setActiveQuest(quest) {
+    this.gameState.activeQuest = quest;
+  }
+  
+  /**
+   * 更新任务进度
+   * @param {number} objectiveIndex - 任务目标索引
+   * @param {number} progress - 当前进度
+   */
+  updateQuestProgress(objectiveIndex, progress) {
+    if (this.gameState.activeQuest && 
+        this.gameState.activeQuest.objectives && 
+        this.gameState.activeQuest.objectives[objectiveIndex]) {
+      this.gameState.activeQuest.objectives[objectiveIndex].current = progress;
     }
   }
   
+  /**
+   * 增加资源数量
+   * @param {string} resourceType - 资源类型
+   * @param {number} amount - 增加数量
+   */
+  addResource(resourceType, amount) {
+    if (this.gameState.resources && this.gameState.resources[resourceType] !== undefined) {
+      this.gameState.resources[resourceType] += amount;
+    }
+  }
   /**
    * 保存玩家当前状态
    * @returns {Object} 玩家状态数据
@@ -864,9 +903,97 @@ class GameManager {
   }
   
   /**
+   * 播放场景背景音乐
+   * @param {Phaser.Scene} scene - 场景实例
+   * @param {Object} musicConfig - 音乐配置 { key: string, volume: number }
+   */
+  playSceneBgMusic(scene, musicConfig) {
+    // 停止当前播放的背景音乐
+    this.stopBgMusic();
+    
+    // 验证音乐配置
+    if (!musicConfig || !musicConfig.key) {
+      console.warn('音乐配置无效或缺少音乐键名');
+      return;
+    }
+    
+    // 创建并播放背景音乐
+    this.currentBgMusic = scene.sound.add(musicConfig.key, {
+      volume: (musicConfig.volume || 0.5) * this.settings.musicVolume,
+      loop: true
+    });
+    
+    // 确保音频完全加载后再播放
+    scene.sound.once('unlocked', () => {
+      if (this.currentBgMusic) {
+        this.currentBgMusic.play();
+      }
+    });
+    
+    // 如果音频系统已经解锁，直接播放
+    if (scene.sound.locked === false) {
+      this.currentBgMusic.play();
+    }
+    
+    console.log(`开始播放背景音乐: ${musicConfig.key}`);
+  }
+  
+  /**
+   * 停止背景音乐
+   */
+  stopBgMusic() {
+    if (this.currentBgMusic) {
+      this.currentBgMusic.stop();
+      this.currentBgMusic.destroy();
+      this.currentBgMusic = null;
+      console.log('背景音乐已停止');
+    }
+  }
+  
+  /**
+   * 设置背景音乐音量
+   * @param {number} volume - 音量值 (0-1)
+   */
+  setBgMusicVolume(volume) {
+    this.settings.musicVolume = Math.max(0, Math.min(1, volume));
+    if (this.currentBgMusic) {
+      this.currentBgMusic.setVolume(this.settings.musicVolume);
+    }
+  }
+  
+  /**
+   * 暂停背景音乐
+   */
+  pauseBgMusic() {
+    if (this.currentBgMusic && this.currentBgMusic.isPlaying) {
+      this.currentBgMusic.pause();
+    }
+  }
+  
+  /**
+   * 恢复背景音乐
+   */
+  resumeBgMusic() {
+    if (this.currentBgMusic && this.currentBgMusic.isPaused) {
+      this.currentBgMusic.resume();
+    }
+  }
+  
+  /**
+   * 检查背景音乐是否正在播放
+   * @returns {boolean} 是否正在播放
+   */
+  isBgMusicPlaying() {
+    return this.currentBgMusic && this.currentBgMusic.isPlaying;
+  }
+
+  /**
    * 清理资源（在游戏结束时调用）
    */
   cleanup() {
+    // 停止背景音乐
+    this.stopBgMusic();
+    
     // 停止游戏计时器
     this.stopGameTimer();
     

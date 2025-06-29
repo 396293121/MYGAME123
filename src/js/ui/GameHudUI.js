@@ -36,8 +36,8 @@ class GameHudUI extends BaseUI {
     // 创建状态文本（等级、职业）
     this.createStatusTexts();
     
-    // 创建技能图标
-    this.createSkillIcons();
+    // 创建技能图标 暂注释
+   // this.createSkillIcons();
     
     // 创建资源显示（金币、精血）
     this.createResourceDisplay();

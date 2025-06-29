@@ -45,9 +45,7 @@ class BaseUI {
     }
     
     // 设置为固定位置（不随相机移动）
-    if (this.type !== 'hud') {
-      this.container.setScrollFactor(0);
-    }
+    this.container.setScrollFactor(0);
     
     return this;
   }
@@ -230,6 +228,8 @@ class BaseUI {
     });
     
     button.on('pointerup', (pointer) => {  
+      //调试调试模式下禁用POINTUP
+      if(button._isButtonInDebugMode)return;
       button.clearTint();
       button.setScale(1);
       if (callback) callback();

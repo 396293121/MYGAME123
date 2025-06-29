@@ -198,6 +198,7 @@ class UIDebugTool {
    */
   toggleDebugMode() {
     this.active = !this.active;
+    this.isDebug = this.active; // 同步更新 isDebug 标志
     
     // 检查game对象是否有效
     if (!this.game || !this.game.scene) {
@@ -485,13 +486,13 @@ class UIDebugTool {
                   
                   // 如果元素有pointerup事件监听器，临时保存并移除它
                   if (child.listeners && child.listeners('pointerup') && child.listeners('pointerup').length > 0) {
-                    // 保存原始的pointerup监听器
-                    child._originalPointerUpListeners = [...child.listeners('pointerup')];
+                    // // 保存原始的pointerup事件监听器
+                    // child._originalPointerUpListeners = [...child.listeners('pointerup')];
                     
-                    // 移除所有pointerup监听器
-                    child.removeAllListeners('pointerup');
+                    // // 移除所有pointerup监听器
+                    // child.removeAllListeners('pointerup');
                     
-                    // 标记为调试模式下的按钮
+                    // // 标记为调试模式下的按钮
                     child._isButtonInDebugMode = true;
                     
                     console.log(`已禁用按钮 "${child.name || child.type || '未命名按钮'}" 的点击事件`);                    
@@ -622,27 +623,12 @@ class UIDebugTool {
    * @param {Phaser.GameObjects.GameObject} gameObject - 被拖拽的游戏对象
    */
   _handleDragEnd(pointer, gameObject) {
-    // 阻止事件冒泡
-    if (pointer && pointer.event && typeof pointer.event.stopPropagation === 'function') {
-      pointer.event.stopPropagation();
-    }
-    
     // 清除拖拽状态标记
     if (gameObject) {
       gameObject.isBeingDragged = false;
       
-      // 如果是调试模式下的按钮，确保当前的pointerup事件不会触发按钮点击
-      // 我们不在这里恢复pointerup事件监听器，而是在disableDragForUIElements中恢复
-      // 这样可以防止当前的pointerup事件触发按钮点击
-      if (gameObject._isButtonInDebugMode) {
-        // 阻止当前帧中的任何pointerup事件
-        if (pointer && pointer.event) {
-          pointer.event.preventDefault();
-          if (typeof pointer.event.stopImmediatePropagation === 'function') {
-            pointer.event.stopImmediatePropagation();
-          }
-        }
-      }
+      // 在调试模式下，我们不需要阻止 pointerup 事件
+      // 因为按钮会在自己的 pointerup 处理中检查 _isButtonInDebugMode 标志
     }
     
     // 检查参数有效性
@@ -762,15 +748,14 @@ class UIDebugTool {
               child.off('drag');
               child.off('dragend');
               
-              // 恢复原始的pointerup事件监听器
-              if (child._isButtonInDebugMode && child._originalPointerUpListeners && Array.isArray(child._originalPointerUpListeners)) {
-                // 恢复所有保存的pointerup监听器
-                child._originalPointerUpListeners.forEach(listener => {
-                  child.on('pointerup', listener.fn, listener.context);
-                });
+              // 如果是调试模式下的按钮，恢复交互功能并清除标记
+              if (child._isButtonInDebugMode) {
+                // 重新启用交互功能
+                if (typeof child.setInteractive === 'function') {
+                  child.setInteractive();
+                }
                 
-                // 清除临时存储的监听器和标记
-                delete child._originalPointerUpListeners;
+                // 清除调试模式标记
                 delete child._isButtonInDebugMode;
                 
                 console.log(`已恢复按钮 "${child.name || child.type || '未命名按钮'}" 的点击事件`);

@@ -172,6 +172,29 @@ class UIManager {
     this.activeUIs = [];
     this.hudUIs = [];
   }
+
+  /**
+   * 切换菜单UI显示状态并控制物理引擎
+   * @param {string} menuKey - 菜单UI键名
+   * @param {Object} data - 传递给UI的数据
+   */
+  toggleMenu(menuKey, data = {}) {
+    const menuUI = this.getUI(menuKey);
+    if (!menuUI) {
+      console.error(`菜单UI不存在: ${menuKey}`);
+      return this;
+    }
+    
+    if (menuUI.visible) {
+      menuUI.hide();
+      this.scene.physics.resume();
+    } else {
+      menuUI.show(data);
+      this.scene.physics.pause();
+    }
+    
+    return this;
+  }
 }
 
 export default UIManager;

@@ -131,11 +131,28 @@ class WildBoar extends Enemy {
     this.scene.time.delayedCall(this.chargeCooldown, () => {
       this.canCharge = true;
     });
+    
+    // 触发冲锋开始事件
+    this.scene.events.emit('wildboar-charge-start', this);
+    
+    // 播放冲锋音效
+    if (EnemyData.WILD_BOAR.soundEffects && EnemyData.WILD_BOAR.soundEffects.charge) {
+      this.scene.sound.play(EnemyData.WILD_BOAR.soundEffects.charge, { volume: 0.7 });
+    }
   }
   
   // 停止冲锋
   stopCharge() {
-    this.isCharging = false;
+    if (this.isCharging) {
+      this.isCharging = false;
+      
+      // 触发冲锋结束事件
+      this.scene.events.emit('wildboar-charge-stop', this);
+      
+      // 冲锋结束后短暂眩晕
+      this.sprite.setVelocity(0);
+      this.stun(500); // 眩晕0.5秒
+    }
   }
   
   // 重写攻击方法

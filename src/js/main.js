@@ -9,6 +9,7 @@ import UIDebugTool from './systems/UIDebugTool.js';
 import MainMenuScene from './scenes/MainMenuScene.js';
 import CharacterSelectScene from './scenes/CharacterSelectScene.js';
 import GameScene from './scenes/GameScene.js';
+import TestScene from './scenes/TestScene.js';
 
 // 游戏配置
 const config = {
@@ -21,12 +22,13 @@ const config = {
     default: 'arcade',
     arcade: {
       gravity: { y: 600 },
-      debug: false
+      debug: true
     }
   },
   scene: [
     MainMenuScene,
     CharacterSelectScene,
+    TestScene,
     GameScene
   ]
 };

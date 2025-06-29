@@ -12,7 +12,7 @@ class Warrior extends Character {
     // 战士特有属性调整
     this.attributes = {
       strength: 8,      // 战士起始力量更高
-      agility: 4,       // 战士敏捷较低
+      agility: 41,       // 战士敏捷较低
       vitality: 7,      // 战士体力较高
       intelligence: 3   // 战士智力较低
     };
@@ -71,10 +71,41 @@ class Warrior extends Character {
   // 重写攻击方法
   attack() {
     console.log('Warrior performs a sword slash!');
-    // 这里可以添加战士特有的攻击动画和效果
     
-    // 返回伤害值，基于物理攻击力
-    return this.stats.physicalAttack;
+    // 调用父类的攻击方法获取基本攻击信息
+    const attackInfo = super.attack();
+    
+    // 战士的攻击伤害略高
+    attackInfo.damage = this.stats.physicalAttack * 1.1;
+    
+    // 这里可以添加战士特有的攻击动画和效果
+    // 例如，创建一个剑光效果
+    if (this.scene) {
+      const direction = this.sprite.flipX ? -1 : 1;
+      // 如果有剑光效果的精灵图，可以在这里添加
+      // const effect = this.scene.add.sprite(
+      //   this.sprite.x + (direction * 30),
+      //   this.sprite.y,
+      //   'sword_effect',
+      //   0
+      // );
+      // effect.setFlipX(direction < 0);
+      // 
+      // // 播放攻击动画并在结束后销毁
+      // this.scene.time.delayedCall(300, () => {
+      //   effect.destroy();
+      // });
+    }
+    
+    return attackInfo;
+  }
+  
+  // 设置攻击冷却
+  startAttackCooldown() {
+    this.canAttack = false;
+    this.scene.time.delayedCall(500, () => {
+      this.canAttack = true;
+    });
   }
   
   // 战士特有技能 - 重斩

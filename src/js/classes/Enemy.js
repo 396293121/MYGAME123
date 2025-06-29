@@ -42,8 +42,6 @@ class Enemy {
     this.sprite.setBounce(0.1);
     this.sprite.setImmovable(false);
     
-    // 动画状态
-    this.sprite.anims.play('slime_idle', true);
   }
   
   // 更新敌人状态
