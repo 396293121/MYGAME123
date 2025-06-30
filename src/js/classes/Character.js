@@ -1,4 +1,7 @@
-import AnimationManager from '../systems/AnimationManager.js';
+
+import { ANIMATION_CONFIGS } from '../data/AnimationConfig.js';
+import EnhancedAnimationManager from '../systems/EnhancedAnimationManager.js';
+import { AudioManager } from '../data/AudioConfig.js';
 
 /**
  * 角色基类
@@ -56,8 +59,14 @@ class Character {
     // 确定角色类型
     this.characterType = this.determineCharacterType(texture);
     
-    // 创建动画管理器
-    this.animationManager = new AnimationManager(scene);
+    // 初始化动画管理器
+    this.animationManager = new EnhancedAnimationManager(this.scene, this.sprite, this.characterType);
+    
+    // 初始化音效管理器
+    this.audioManager = new AudioManager(this.scene);
+    
+    // 在sprite上添加character引用，供动画管理器访问
+    this.sprite.character = this;
     
     // 应用标准化配置（尺寸和锚点）
     this.animationManager.applyStandardSize(this.sprite, this.characterType);
@@ -78,6 +87,19 @@ class Character {
     
     // 处理跳跃
     this.handleJump(cursors);
+    
+    // 更新跳跃动画状态
+    this.updateJumpAnimationState();
+  }
+  
+  /**
+   * 更新跳跃动画状态
+   * 在游戏循环中调用，根据垂直速度自动切换跳跃动画
+   */
+  updateJumpAnimationState() {
+    if (this.animationManager && !this.sprite.body.onFloor()) {
+      this.animationManager.updateJumpAnimationState(this.sprite, this.characterType);
+    }
   }
   
   // 处理角色移动
@@ -87,7 +109,12 @@ class Character {
     
     if (cursors.left.isDown) {
       this.sprite.setVelocityX(-moveSpeed);
-      this.sprite.flipX = true;
+      // 只有在非攻击状态下才改变方向
+      if (this.state !== 'attack') {
+        this.sprite.flipX = true;
+      }else{
+        console.log(11111)
+      }
       
       // 如果角色在地面上且不在攻击状态，播放移动动画
       if (this.sprite.body.onFloor() && this.state !== 'attack' && this.state !== 'hurt' && this.state !== 'die') {
@@ -95,7 +122,10 @@ class Character {
       }
     } else if (cursors.right.isDown) {
       this.sprite.setVelocityX(moveSpeed);
-      this.sprite.flipX = false;
+      // 只有在非攻击状态下才改变方向
+      if (this.state !== 'attack') {
+        this.sprite.flipX = false;
+      }
       
       // 如果角色在地面上且不在攻击状态，播放移动动画
       if (this.sprite.body.onFloor() && this.state !== 'attack' && this.state !== 'hurt' && this.state !== 'die') {
@@ -116,10 +146,8 @@ class Character {
   handleJump(cursors) {
     if (cursors.up.isDown && this.sprite.body.onFloor()) {
       this.sprite.setVelocityY(-this.stats.jumpForce);
-      // 播放跳跃音效（如果有的话）
-      if (this.scene.sound && this.scene.sound.get('jump_sound')) {
-        this.scene.sound.play('jump_sound', { volume: 0.5 });
-      }
+      // 播放跳跃音效
+      this.audioManager.playCharacterSound(this.characterType, 'movement', 'jump');
       
       // 播放跳跃动画
       this.playAnimation('jump');
@@ -188,34 +216,80 @@ class Character {
     // 如果在冷却中，不能攻击
     if (!this.canAttack) return null;
     
+    // 设置攻击状态，锁定角色方向
+    this.state = 'attack';
+    
     // 基础攻击逻辑，子类可以重写
     console.log(`${this.constructor.name} performs a basic attack`);
     
-    // 创建攻击区域
-    const direction = this.sprite.flipX ? -1 : 1;
-    const attackArea = new Phaser.Geom.Rectangle(
-      this.sprite.x + (direction * 30),
-      this.sprite.y,
-      50,
-      60
-    );
+    // 播放挥剑音效（攻击开始时）
+    this.audioManager.playDelayedSound(this.characterType, 'attack', 'swing');
     
-    // 播放攻击音效（如果有的话）
-    if (this.scene.sound && this.scene.sound.get('attack_sound')) {
-      this.scene.sound.play('attack_sound', { volume: 0.5 });
-    }
-    
-    // 播放攻击动画
-    this.playAnimation('attack');
+    // 播放攻击动画，并设置关键帧回调
+    this.playAnimation('attack', (frameIndex, totalFrames) => {
+      this.executeAttackHit();
+      // 攻击动画结束后重置状态
+      if (frameIndex === totalFrames - 1) {
+        this.state = 'idle';
+      }
+    });
     
     // 开始攻击冷却
     this.startAttackCooldown();
     
+    // 返回攻击启动信息（不包含具体攻击数据）
     return {
-      damage: this.stats.physicalAttack,
-      area: attackArea,
-      direction: direction
+      initiated: true,
+      attacker: this
     };
+  }
+  
+  /**
+   * 执行攻击命中判定（在关键帧触发）
+   * 实时计算攻击方向
+   */
+  executeAttackHit() {
+    // 从配置文件中读取攻击范围参数
+    const config = ANIMATION_CONFIGS[this.characterType];
+    const enhancedConfig = config?.enhancedAnimation?.attack;
+    
+    // 如果没有增强配置，使用默认值
+    const attackWidth = enhancedConfig?.hitbox?.width || 74;
+    const attackHeight = enhancedConfig?.hitbox?.height || 100;
+    const offsetX = enhancedConfig?.hitbox?.offsetX || 0;
+    const offsetY = enhancedConfig?.hitbox?.offsetY || -15;
+    
+    // 实时计算攻击方向
+    const direction = this.sprite.flipX ? -1 : 1;
+
+    const attackArea = new Phaser.Geom.Rectangle(
+      this.sprite.x + (direction > 0 ? offsetX : -attackWidth), // 向左攻击时，从角色位置减去攻击宽度
+      this.sprite.y - attackHeight + offsetY, // 调整Y坐标，使攻击框更好地对齐角色中心
+      attackWidth, // 攻击宽度
+      attackHeight
+    );
+    // 通过全局事件总线发布攻击命中事件
+    if (window.eventBus) {
+      window.eventBus.emit('playerAttackHit', {
+        attacker: this,
+        damage: this.stats.physicalAttack,
+        area: attackArea,
+        direction: direction,
+        timestamp: Date.now()
+      });
+    }
+    
+    // 可选：显示攻击范围调试信息
+    if (this.scene.physics && this.scene.physics.world.drawDebug) {
+      const graphics = this.scene.add.graphics();
+      graphics.lineStyle(2, 0xff0000);
+      graphics.strokeRectShape(attackArea);
+      
+      // 短暂显示后销毁
+      this.scene.time.delayedCall(200, () => {
+        graphics.destroy();
+      });
+    }
   }
   
   // 开始攻击冷却
@@ -266,7 +340,7 @@ class Character {
       this.sprite.clearTint();
     });
     
-    // 播放受伤动画
+    // 播放受伤动画和音效
     this.playAnimation('hurt');
     
     // 监听动画完成事件，完成后恢复到站立状态
@@ -285,7 +359,8 @@ class Character {
     // 击退效果
     if (attacker) {
       const knockbackDirection = this.sprite.x < attacker.x ? -1 : 1;
-      this.sprite.setVelocity(knockbackDirection * 200, -200);
+      // 只进行水平击退，不影响垂直速度
+      this.sprite.setVelocityX(knockbackDirection * 200);
       
       // 短暂无敌时间
       this.isInvulnerable = true;
@@ -314,8 +389,13 @@ class Character {
     this.sprite.setAlpha(0.7);
     this.isDead = true;
     
-    // 播放死亡动画
+    // 播放死亡动画和音效
     this.playAnimation('die');
+    
+    // 播放死亡音效
+    if (this.scene && this.scene.sound) {
+      this.scene.sound.play(`${this.characterType}_die`, { volume: 0.7 });
+    }
     
     // 禁用物理碰撞
     if (this.sprite.body) {
@@ -382,25 +462,27 @@ class Character {
 
   /**
    * 创建角色动画
-   * 使用动画管理器为角色创建各种状态的动画
+   * 使用增强动画管理器为角色创建各种状态的动画
    */
   createAnimations() {
-    this.animationManager.createAnimationsForCharacter(this.characterType);
+    this.animationManager.createEnhancedAnimationsForCharacter(this.characterType);
   }
 
     
   /**
    * 播放指定动画
    * @param {string} animationKey - 动画键名后缀，如'idle', 'move', 'attack'等
+   * @param {Function} onKeyFrame - 关键帧回调（用于攻击判定）
    */
-  playAnimation(animationKey) {
-    // 使用动画管理器播放动画
-    const success = this.animationManager.playAnimation(
+  playAnimation(animationKey, onKeyFrame = null) {
+    // 使用增强动画管理器播放动画
+    const success = this.animationManager.playEnhancedAnimation(
       this.sprite,
       this.characterType,
       animationKey,
       this.originalTextureKey,
-      () => this.onAnimationComplete(animationKey)
+      () => this.onAnimationComplete(animationKey),
+      onKeyFrame
     );
     
     if (success) {
@@ -449,6 +531,8 @@ class Character {
    */
   destroy() {
     if (this.animationManager) {
+      // 清理精灵的动画状态
+      this.animationManager.clearSpriteState(this.sprite);
       this.animationManager.destroy();
     }
     

@@ -23,6 +23,39 @@ const ANIMATION_CONFIGS = {
       offsetX: 0,  // X轴偏移为0，因为角色已在中心位置且左右对称
       offsetY: 50  // Y轴偏移（从画布底部向上50像素到角色底部）
     },
+    // 增强动画系统配置
+    enhancedAnimation: {
+      // 跳跃动画配置
+      jump: {
+        velocityThresholds: {
+          rising: -50,    // 上升状态的速度阈值
+          falling: 50     // 下落状态的速度阈值
+        },
+        frameDistribution: {
+          risingEndFrame: 10,      // 上升动画结束帧（具体帧数）
+          fallingStartFrame: 11,   // 下落动画开始帧（具体帧数）
+          fallingEndFrame: 14     // 下落动画结束帧（具体帧数）
+        },
+        frameRateMultiplier: {
+          rising: 1.0,    // 上升动画帧率倍数
+          falling: 0.8    // 下落动画帧率倍数（稍慢）
+        },
+        holdLastFrame: true     // 是否在最后一帧停留而不循环
+      },
+      // 攻击动画配置
+      attack: {
+        keyFrame: {
+          frameNumber: 9        // 关键帧的具体帧数（对应实际第6帧）
+        },
+        //剑伸出剑尖X坐标：180 角色中心106
+        hitbox: {
+          width: 74,           // 攻击宽度（像素）
+          height: 100,         // 攻击高度（像素）
+          offsetX: 0,          // X轴偏移（剑伸出的距离）
+          offsetY: -15         // Y轴偏移（攻击框向上的偏移）
+        }
+      }
+    },
     animations: {
       idle: {
         key: 'warrior_idle',
@@ -56,7 +89,7 @@ const ANIMATION_CONFIGS = {
           type: 'frameNames',
           prefix: '战士攻击_frame_',
           start: 1,
-          end: 14,
+          end: 10,
           zeroPad: 6,
           suffix: '.png'
         },
@@ -69,7 +102,7 @@ const ANIMATION_CONFIGS = {
           type: 'frameNames',
           prefix: '战士跳跃_frame_',
           start: 1,
-          end: 10,
+          end: 17,
           zeroPad: 6,
           suffix: '.png'
         },
@@ -80,26 +113,26 @@ const ANIMATION_CONFIGS = {
         key: 'warrior_hurt',
         frames: {
           type: 'frameNames',
-          prefix: '战士站立_frame_',
+          prefix: '战士受伤_frame_',
           start: 1,
-          end: 2,
+          end: 30,
           zeroPad: 6,
           suffix: '.png'
         },
-        frameRate: 8,
+        frameRate: 12,
         repeat: 0
       },
       die: {
         key: 'warrior_die',
         frames: {
           type: 'frameNames',
-          prefix: '战士站立_frame_',
+          prefix: '战士死亡_frame_',
           start: 1,
-          end: 4,
+          end: 30,
           zeroPad: 6,
           suffix: '.png'
         },
-        frameRate: 8,
+        frameRate: 10,
         repeat: 0
       }
     }
@@ -107,6 +140,55 @@ const ANIMATION_CONFIGS = {
 
   mage: {
     textureKey: 'mage',
+    // 标准尺寸配置
+    standardSize: {
+      width: 64,
+      height: 64
+    },
+    // 锚点配置
+    anchorPoint: {
+      x: 0.5,
+      y: 1.0
+    },
+    // 物理体配置
+    physicsBody: {
+      width: 32,
+      height: 48,
+      offsetX: 0,
+      offsetY: 16
+    },
+    // 增强动画系统配置
+    enhancedAnimation: {
+      // 跳跃动画配置
+      jump: {
+        velocityThresholds: {
+          rising: -40,    // 上升状态的速度阈值
+          falling: 40     // 下落状态的速度阈值
+        },
+        frameDistribution: {
+          risingEndFrame: 1,      // 上升动画结束帧（具体帧数）
+          fallingStartFrame: 2,   // 下落动画开始帧（具体帧数）
+          fallingEndFrame: 3      // 下落动画结束帧（具体帧数）
+        },
+        frameRateMultiplier: {
+          rising: 1.0,    // 上升动画帧率倍数
+          falling: 0.8    // 下落动画帧率倍数
+        },
+        holdLastFrame: true     // 是否在最后一帧停留而不循环
+      },
+      // 攻击动画配置
+      attack: {
+        keyFrame: {
+          frameNumber: 2        // 关键帧的具体帧数（法师攻击释放更早）
+        },
+        hitbox: {
+          width: 150,           // 攻击宽度（法师攻击范围更大）
+          height: 80,           // 攻击高度
+          offsetX: 40,          // X轴偏移
+          offsetY: 80           // Y轴偏移
+        }
+      }
+    },
     animations: {
       idle: {
         key: 'mage_idle',
@@ -258,4 +340,5 @@ const ANIMATION_CONFIGS = {
   }
 };
 
+export { ANIMATION_CONFIGS };
 export default ANIMATION_CONFIGS;

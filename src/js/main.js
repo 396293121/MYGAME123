@@ -6,10 +6,15 @@
 import Phaser from 'phaser';
 import GameManager from './GameManager.js';
 import UIDebugTool from './systems/UIDebugTool.js';
+import EventBus from './systems/EventBus.js';
 import MainMenuScene from './scenes/MainMenuScene.js';
 import CharacterSelectScene from './scenes/CharacterSelectScene.js';
 import GameScene from './scenes/GameScene.js';
 import TestScene from './scenes/TestScene.js';
+
+// 初始化全局事件总线
+window.eventBus = EventBus;
+window.eventBus.setDebugMode(true); // 开启调试模式
 
 // 游戏配置
 const config = {

@@ -199,8 +199,8 @@ class GameManager {
     
     return {
       position: {
-        x: this.player.x,
-        y: this.player.y
+        x: this.player.sprite.x,
+        y: this.player.sprite.y
       },
       stats: this.player.stats,
       level: this.player.level,
@@ -400,8 +400,8 @@ class GameManager {
         maxMana: this.player.maxMana,
         stats: { ...this.player.stats },
         position: {
-          x: this.player.x,
-          y: this.player.y,
+          x: this.player.sprite.x,
+          y: this.player.sprite.y,
           direction: this.player.flipX ? 'left' : 'right'
         },
         skills: this.player.skills.map(skill => skill.id)
@@ -524,8 +524,8 @@ class GameManager {
         
         // 应用玩家位置
         if (gameState.player.position) {
-          this.player.x = gameState.player.position.x;
-          this.player.y = gameState.player.position.y;
+          this.player.sprite.x = gameState.player.position.x;
+          this.player.sprite.y = gameState.player.position.y;
           this.player.flipX = gameState.player.position.direction === 'left';
         }
         
@@ -924,11 +924,13 @@ class GameManager {
     });
     
     // 确保音频完全加载后再播放
-    scene.sound.once('unlocked', () => {
-      if (this.currentBgMusic) {
-        this.currentBgMusic.play();
-      }
-    });
+    if (scene.sound && typeof scene.sound.once === 'function') {
+      scene.sound.once('unlocked', () => {
+        if (this.currentBgMusic) {
+          this.currentBgMusic.play();
+        }
+      });
+    }
     
     // 如果音频系统已经解锁，直接播放
     if (scene.sound.locked === false) {

@@ -48,15 +48,17 @@ class Enemy {
   update(time, delta, player) {
     if (this.currentState === this.states.DEAD) return;
     
-    // 计算与玩家的距离
-    const distance = Phaser.Math.Distance.Between(
-      this.sprite.x, this.sprite.y,
-      player.x, player.y
-    );
-    
-    // 根据距离和状态更新AI行为
-    this.updateState(distance, player);
-    
+    // 如果玩家对象存在，计算距离并更新AI行为
+    if (player && player.sprite) {
+      // 计算与玩家的距离
+      const distance = Phaser.Math.Distance.Between(
+        this.sprite.x, this.sprite.y,
+        player.sprite.x, player.sprite.y
+      );
+      
+      // 根据距离和状态更新AI行为
+      this.updateState(distance, player);
+    }
     // 执行当前状态对应的行为
     switch (this.currentState) {
       case this.states.IDLE:
@@ -150,10 +152,13 @@ class Enemy {
   
   // 追逐行为
   chaseBehavior(player) {
+    // 检查玩家对象是否存在
+    if (!player || !player.sprite) return;
+    
     // 计算朝向玩家的角度
     const angle = Phaser.Math.Angle.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     // 向玩家移动
@@ -168,6 +173,9 @@ class Enemy {
   attackBehavior(player) {
     // 停止移动
     this.sprite.setVelocity(0);
+    
+    // 检查玩家对象是否存在
+    if (!player || !player.sprite) return;
     
     // 如果可以攻击
     if (this.canAttack) {
@@ -184,12 +192,15 @@ class Enemy {
   
   // 攻击方法
   attack(player) {
+    // 检查玩家对象是否存在
+    if (!player || !player.sprite) return;
+    
     console.log(`${this.constructor.name} attacks player`);
     
     // 计算与玩家的距离
     const distance = Phaser.Math.Distance.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     // 如果在攻击范围内，对玩家造成伤害
@@ -251,8 +262,7 @@ class Enemy {
   
   // 眩晕方法
   stun(duration) {
-    // 保存之前的状态
-    this.previousState = this.currentState;
+    // 设置眩晕状态
     this.currentState = this.states.STUNNED;
     
     // 停止移动
@@ -263,7 +273,8 @@ class Enemy {
     
     // 设置眩晕结束计时器
     this.scene.time.delayedCall(duration, () => {
-      this.currentState = this.previousState;
+      // 眩晕结束后设置为IDLE状态，让下次update重新评估状态
+      this.currentState = this.states.IDLE;
       this.sprite.clearTint();
     });
   }

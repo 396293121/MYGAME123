@@ -20,6 +20,10 @@ class WildBoar extends Enemy {
     this.speed = data.stats.speed;
     this.exp = data.stats.exp;
     
+    // 从EnemyData设置检测和攻击范围
+    this.detectionRange = data.detectionRadius || 150;
+    this.attackRange = data.attackRange || 50;
+    
     // 从EnemyData设置冲锋相关属性
     this.chargeSpeed = data.chargeSpeed;
     this.chargeCooldown = data.chargeCooldown * 1000; // 转换为毫秒
@@ -74,6 +78,7 @@ class WildBoar extends Enemy {
   update(time, delta, player) {
     super.update(time, delta, player);
     
+
     // 获取动画数据
     const data = EnemyData.WILD_BOAR;
     
@@ -87,10 +92,10 @@ class WildBoar extends Enemy {
     }
     
     // 野猪特有的冲锋行为
-    if (this.currentState === this.states.CHASE && this.canCharge && !this.isCharging) {
+    if (this.currentState === this.states.CHASE && this.canCharge && !this.isCharging && player && player.sprite) {
       const distance = Phaser.Math.Distance.Between(
         this.sprite.x, this.sprite.y,
-        player.x, player.y
+        player.sprite.x, player.sprite.y
       );
       
       if (distance < this.chargeDistance && distance > this.attackRange) {
@@ -109,10 +114,13 @@ class WildBoar extends Enemy {
   
   // 野猪的冲锋行为
   charge(player) {
+    // 检查玩家对象是否存在
+    if (!player || !player.sprite) return;
+    
     // 计算朝向玩家的角度
     const angle = Phaser.Math.Angle.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     // 设置冲锋速度
@@ -163,7 +171,7 @@ class WildBoar extends Enemy {
     // 如果与玩家接触，造成伤害
     const distance = Phaser.Math.Distance.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     if (distance <= this.attackRange) {
@@ -172,7 +180,7 @@ class WildBoar extends Enemy {
       // 击退效果
       const angle = Phaser.Math.Angle.Between(
         this.sprite.x, this.sprite.y,
-        player.x, player.y
+        player.sprite.x, player.sprite.y
       );
       
       player.sprite.setVelocityX(Math.cos(angle) * 150);

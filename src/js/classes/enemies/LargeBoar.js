@@ -17,6 +17,10 @@ class LargeBoar extends Enemy {
     this.speed = EnemyData.LARGE_BOAR.stats.speed;
     this.exp = EnemyData.LARGE_BOAR.stats.exp;
     
+    // 从EnemyData设置检测和攻击范围
+    this.detectionRange = EnemyData.LARGE_BOAR.detectionRadius || 200;
+    this.attackRange = EnemyData.LARGE_BOAR.attackRange || 60;
+    
     // 从EnemyData获取冲锋相关属性
     this.chargeSpeed = EnemyData.LARGE_BOAR.chargeSpeed;
     this.chargeCooldown = EnemyData.LARGE_BOAR.chargeCooldown * 1000; // 转换为毫秒
@@ -98,7 +102,7 @@ class LargeBoar extends Enemy {
     if (this.currentState === this.states.CHASE && this.canCharge && !this.isCharging && !this.isStomping) {
       const distance = Phaser.Math.Distance.Between(
         this.sprite.x, this.sprite.y,
-        player.x, player.y
+        player.sprite.x, player.sprite.y
       );
       
       if (distance < this.chargeDistance && distance > this.attackRange) {
@@ -110,7 +114,7 @@ class LargeBoar extends Enemy {
     if (this.currentState === this.states.ATTACK && this.canStomp && !this.isStomping && !this.isCharging) {
       const distance = Phaser.Math.Distance.Between(
         this.sprite.x, this.sprite.y,
-        player.x, player.y
+        player.sprite.x, player.sprite.y
       );
       
       if (distance <= this.stompRadius && Math.random() < 0.3) {
@@ -132,7 +136,7 @@ class LargeBoar extends Enemy {
     // 计算朝向玩家的角度
     const angle = Phaser.Math.Angle.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     // 设置冲锋速度
@@ -163,6 +167,9 @@ class LargeBoar extends Enemy {
   
   // 大型野猪的践踏技能
   groundStomp(player) {
+    // 检查玩家对象是否存在
+    if (!player || !player.sprite) return;
+    
     // 停止移动
     this.sprite.setVelocity(0);
     
@@ -198,7 +205,7 @@ class LargeBoar extends Enemy {
     // 对范围内的玩家造成伤害
     const distance = Phaser.Math.Distance.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     if (distance <= this.stompRadius) {
@@ -207,7 +214,7 @@ class LargeBoar extends Enemy {
       // 击退效果
       const angle = Phaser.Math.Angle.Between(
         this.sprite.x, this.sprite.y,
-        player.x, player.y
+        player.sprite.x, player.sprite.y
       );
       
       player.sprite.setVelocityX(Math.cos(angle) * 200);
@@ -242,7 +249,7 @@ class LargeBoar extends Enemy {
     // 如果与玩家接触，造成伤害
     const distance = Phaser.Math.Distance.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     if (distance <= this.attackRange) {
@@ -251,7 +258,7 @@ class LargeBoar extends Enemy {
       // 击退效果
       const angle = Phaser.Math.Angle.Between(
         this.sprite.x, this.sprite.y,
-        player.x, player.y
+        player.sprite.x, player.sprite.y
       );
       
       player.sprite.setVelocityX(Math.cos(angle) * 180);

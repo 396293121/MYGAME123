@@ -152,7 +152,7 @@ class MysteriousStranger extends Enemy {
     if (this.currentState === this.states.CHASE || this.currentState === this.states.ATTACK) {
       const distance = Phaser.Math.Distance.Between(
         this.sprite.x, this.sprite.y,
-        player.x, player.y
+        player.sprite.x, player.sprite.y
       );
       
       // 根据距离和冷却选择技能
@@ -252,6 +252,9 @@ class MysteriousStranger extends Enemy {
   
   // 重击技能
   heavyStrike(player) {
+    // 检查玩家对象是否存在
+    if (!player || !player.sprite) return;
+    
     // 停止移动
     this.sprite.setVelocity(0);
     
@@ -268,7 +271,7 @@ class MysteriousStranger extends Enemy {
     this.scene.time.delayedCall(500, () => {
       const distance = Phaser.Math.Distance.Between(
         this.sprite.x, this.sprite.y,
-        player.x, player.y
+        player.sprite.x, player.sprite.y
       );
       
       if (distance <= this.attackRange * 1.2) {
@@ -277,7 +280,7 @@ class MysteriousStranger extends Enemy {
         // 强力击退效果
         const angle = Phaser.Math.Angle.Between(
           this.sprite.x, this.sprite.y,
-          player.x, player.y
+          player.sprite.x, player.sprite.y
         );
         
         player.sprite.setVelocityX(Math.cos(angle) * 300);
@@ -304,6 +307,9 @@ class MysteriousStranger extends Enemy {
   
   // 暗影斩技能
   shadowSlash(player) {
+    // 检查玩家对象是否存在
+    if (!player || !player.sprite) return;
+    
     // 停止移动
     this.sprite.setVelocity(0);
     
@@ -321,7 +327,7 @@ class MysteriousStranger extends Enemy {
       // 计算朝向玩家的角度
       const angle = Phaser.Math.Angle.Between(
         this.sprite.x, this.sprite.y,
-        player.x, player.y
+        player.sprite.x, player.sprite.y
       );
       
       // 创建暗影斩效果
@@ -340,8 +346,8 @@ class MysteriousStranger extends Enemy {
       // 快速移动到玩家位置
       this.scene.tweens.add({
         targets: this.sprite,
-        x: player.x - Math.cos(angle) * 50,
-        y: player.y - Math.sin(angle) * 50,
+        x: player.sprite.x - Math.cos(angle) * 50,
+        y: player.sprite.y - Math.sin(angle) * 50,
         duration: 200,
         onComplete: () => {
           // 对玩家造成伤害
@@ -368,6 +374,9 @@ class MysteriousStranger extends Enemy {
   
   // 战吼技能
   battleCry(player) {
+    // 检查玩家对象是否存在
+    if (!player || !player.sprite) return;
+    
     // 停止移动
     this.sprite.setVelocity(0);
     
@@ -416,7 +425,7 @@ class MysteriousStranger extends Enemy {
     // 对范围内的玩家造成效果
     const distance = Phaser.Math.Distance.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     if (distance <= this.battleCryRadius) {
@@ -457,7 +466,7 @@ class MysteriousStranger extends Enemy {
     // 如果与玩家接触，造成伤害
     const distance = Phaser.Math.Distance.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     if (distance <= this.attackRange) {
@@ -466,7 +475,7 @@ class MysteriousStranger extends Enemy {
       // 击退效果
       const angle = Phaser.Math.Angle.Between(
         this.sprite.x, this.sprite.y,
-        player.x, player.y
+        player.sprite.x, player.sprite.y
       );
       
       player.sprite.setVelocityX(Math.cos(angle) * 150);

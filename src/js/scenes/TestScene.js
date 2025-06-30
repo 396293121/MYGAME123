@@ -43,7 +43,12 @@ class TestScene extends Phaser.Scene {
     this.load.audio('game_music', 'assets/audio/game_music.wav');
     this.load.audio('jump_sound', 'assets/audio/jump_sound.mp3');
     this.load.audio('attack_sound', 'assets/audio/warrior_attack.mp3');
-   this.load.audio('boar_charge', 'assets/audio/boar_charge.mp3');
+    this.load.audio('boar_charge', 'assets/audio/boar_charge.mp3');
+    
+    // 加载战士专用音效
+    this.load.audio('warrior_sword_swing', 'assets/audio/sword_swing.wav');       // 挥剑音效
+    this.load.audio('warrior_sword_hit', 'assets/audio/sword_hit.wav');           // 命中音效
+    this.load.audio('warrior_jump', 'assets/audio/jump_sound.mp3');               // 跳跃音效（复用现有）
     // 加载UI按钮纹理
 this.load.image('continue_button', 'assets/images/ui/buttons/continue_2.png');
 this.load.image('save_button', 'assets/images/ui/buttons/save_2.png');
@@ -63,6 +68,9 @@ this.load.spritesheet('items', 'assets/images/items/items_spritesheet.png', {
   }
 
   create() {
+    // 初始化音频
+    this.initializeAudio();
+    
     // 创建地图
     this.createMap();
     
@@ -409,7 +417,7 @@ this.load.spritesheet('items', 'assets/images/items/items_spritesheet.png', {
     this.inputManager.update();
     
     // 更新敌人系统
-    this.enemySystem.update(time, delta, this.player.sprite);
+    this.enemySystem.update(time, delta, this.player);
     
     // 处理所有敌人的特殊行为
     this.enemySystem.handleSpecialBehaviors();
@@ -432,6 +440,26 @@ this.load.spritesheet('items', 'assets/images/items/items_spritesheet.png', {
   // togglePauseMenu方法已移至InputManager类中
   
   // 野猪特殊行为处理已移至EnemySystem类中的handleWildBoarBehavior方法
+  
+  initializeAudio() {
+    // 初始化所有音频对象
+    console.log('Initializing audio...');
+    
+    // 检查音频缓存并初始化
+    const audioKeys = ['game_music', 'jump_sound', 'attack_sound', 'boar_charge', 'warrior_sword_swing', 'warrior_sword_hit'];
+    
+    audioKeys.forEach(key => {
+      if (this.cache.audio.has(key)) {
+        this.sound.add(key);
+        console.log(`Audio '${key}' initialized successfully`);
+      } else {
+        console.warn(`Audio '${key}' not found in cache`);
+      }
+    });
+    
+    // 输出当前场景中的音频数量
+    console.log(`Total sounds in scene: ${this.sound.sounds.length}`);
+  }
 }
 
 export default TestScene;

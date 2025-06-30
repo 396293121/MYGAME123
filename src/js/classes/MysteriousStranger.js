@@ -123,7 +123,7 @@ class MysteriousStranger extends Enemy {
     // 计算与玩家的距离
     const distance = Phaser.Math.Distance.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     // 如果在攻击范围内，对玩家造成伤害
@@ -154,7 +154,7 @@ class MysteriousStranger extends Enemy {
     // 计算与玩家的距离
     const distance = Phaser.Math.Distance.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     // 如果在特殊攻击范围内，对玩家造成伤害

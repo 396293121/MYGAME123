@@ -339,8 +339,8 @@ class SaveSystem {
         maxMana: game.player.maxMana,
         stats: { ...game.player.stats },
         position: {
-          x: game.player.x,
-          y: game.player.y,
+          x: game.player.sprite.x,
+          y: game.player.sprite.y,
           direction: game.player.direction
         },
         skills: game.player.skills.map(skill => skill.id),
@@ -437,8 +437,8 @@ class SaveSystem {
         
         // 设置位置
         if (gameState.character.position) {
-          game.player.x = gameState.character.position.x;
-          game.player.y = gameState.character.position.y;
+          game.player.sprite.x = gameState.character.position.x;
+          game.player.sprite.y = gameState.character.position.y;
           game.player.direction = gameState.character.position.direction;
         }
         

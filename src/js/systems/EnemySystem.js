@@ -3,7 +3,6 @@
  * 管理游戏中所有敌人的生成、行为和交互
  */
 import Enemy from '../classes/Enemy.js';
-import DarkMage from '../classes/enemies/DarkMage.js';
 import MysteriousStranger from '../classes/enemies/MysteriousStranger.js';
 import BoarKing from '../classes/enemies/BoarKing.js';
 import LargeBoar from '../classes/enemies/LargeBoar.js';
@@ -23,7 +22,6 @@ class EnemySystem {
     
     // 敌人类型映射
     this.enemyTypes = {
-      'dark_mage': DarkMage,
       'mysterious_stranger': MysteriousStranger,
       'boar_king': BoarKing,
       'large_boar': LargeBoar,
@@ -136,6 +134,13 @@ class EnemySystem {
         activeEnemies: this.enemies.length
       });
     });
+    
+    // 监听玩家攻击事件
+    if (window.eventBus) {
+      window.eventBus.on('playerAttackHit', (attackInfo) => {
+        this.handlePlayerAttackHit(attackInfo);
+      }, this);
+    }
   }
   
   /**
@@ -744,19 +749,28 @@ class EnemySystem {
       player.takeDamage(enemy.damage, 'physical', enemy.sprite);
     }
     
-    // 如果敌人有attack方法，调用它
-    if (typeof enemy.attack === 'function') {
-      enemy.attack(player);
-    }
+    // 注意：不再调用enemy.attack方法，避免重复伤害处理
+    // 伤害已经在上面的代码中处理了
   }
   
   /**
-   * 处理玩家攻击
+   * 处理玩家攻击命中事件（通过事件系统触发）
    * @param {Object} attackInfo - 攻击信息
-   * @param {Character} player - 玩家角色
    */
-  handlePlayerAttack(attackInfo, player) {
+  handlePlayerAttackHit(attackInfo) {
+    if (!attackInfo || !attackInfo.area) {
+      Logger.warn('Invalid attack info received', attackInfo);
+      return;
+    }
+    
+    Logger.debug('Processing player attack hit', {
+      damage: attackInfo.damage,
+      direction: attackInfo.direction,
+      timestamp: attackInfo.timestamp
+    });
+    
     // 检测攻击区域内的敌人
+    let hitCount = 0;
     this.enemies.forEach(enemy => {
       if (Phaser.Geom.Rectangle.ContainsPoint(
         attackInfo.area,
@@ -764,13 +778,38 @@ class EnemySystem {
       )) {
         // 对敌人造成伤害
         this.damageEnemy(enemy, attackInfo.damage);
+        hitCount++;
+        
+        // 播放命中音效
+        if (attackInfo.attacker && attackInfo.attacker.audioManager) {
+          attackInfo.attacker.audioManager.playCharacterSound(
+            attackInfo.attacker.characterType, 
+            'attack', 
+            'hit'
+          );
+        }
         
         // 如果是野猪类型的敌人，有概率停止冲锋
         if (enemy.constructor.name === 'WildBoar' && enemy.isCharging) {
           // WildBoar类的takeDamage方法已经处理了这个逻辑
         }
+        
+        // 发布敌人被攻击事件
+        if (window.eventBus) {
+          window.eventBus.emit('enemyHit', {
+            enemy: enemy,
+            attacker: attackInfo.attacker,
+            damage: attackInfo.damage,
+            timestamp: Date.now()
+          });
+        }
       }
     });
+    
+    // 记录攻击统计
+    if (hitCount > 0) {
+      Logger.debug(`Player attack hit ${hitCount} enemies`);
+    }
   }
   
   /**
@@ -842,7 +881,7 @@ class EnemySystem {
    */
   handleWildBoarChargeStart(boar) {
     // 添加冲锋开始的视觉效果
-    const chargeEffect = this.scene.add.particles('wild_boar_sprite', {
+    const chargeEffect = this.scene.add.particles(boar.sprite.x, boar.sprite.y, 'wild_boar_sprite', {
       speed: 100,
       scale: { start: 0.2, end: 0 },
       blendMode: 'ADD',
@@ -857,7 +896,7 @@ class EnemySystem {
     });
     
     // 播放冲锋音效
-    this.scene.sound.play('attack_sound', { volume: 0.5 });
+   this.scene.sound.play('attack_sound', { volume: 0.5 });
   }
   
   /**
@@ -866,14 +905,13 @@ class EnemySystem {
    */
   handleWildBoarChargeStop(boar) {
     // 添加冲锋结束的视觉效果（尘土飞扬）
-    const dustEffect = this.scene.add.particles('wild_boar_sprite', {
+    const dustEffect = this.scene.add.particles(boar.sprite.x, boar.sprite.y + 20, 'wild_boar_sprite', {
       speed: 50,
       scale: { start: 0.1, end: 0 },
       blendMode: 'NORMAL',
       lifespan: 500,
       frequency: 20
     });
-    dustEffect.setPosition(boar.sprite.x, boar.sprite.y + 20);
     
     // 0.5秒后自动销毁粒子效果
     this.scene.time.delayedCall(500, () => {
@@ -881,7 +919,7 @@ class EnemySystem {
     });
     
     // 播放冲锋停止音效
-    this.scene.sound.play('boar_charge', { volume: 0.3 });
+  //  this.scene.sound.play('boar_charge', { volume: 0.3 });
   }
   
   /**
@@ -928,10 +966,10 @@ class EnemySystem {
       enemy.stun(1000); // 眩晕1秒
       
       // 播放撞墙音效
-      this.scene.sound.play('boar_charge', { volume: 0.7 });
+    //  this.scene.sound.play('boar_charge', { volume: 0.7 });
       
       // 添加撞墙视觉效果
-      const impactEffect = this.scene.add.particles('wild_boar_sprite', {
+      const impactEffect = this.scene.add.particles(enemy.sprite.x, enemy.sprite.y, 'wild_boar_sprite', {
         speed: 100,
         scale: { start: 0.3, end: 0 },
         blendMode: 'NORMAL',
@@ -939,7 +977,6 @@ class EnemySystem {
         frequency: 10,
         quantity: 10
       });
-      impactEffect.setPosition(enemy.sprite.x, enemy.sprite.y);
       
       // 0.5秒后自动销毁粒子效果
       this.scene.time.delayedCall(500, () => {
@@ -966,7 +1003,7 @@ class EnemySystem {
       this.scene.sound.play('boar_charge', { volume: 0.9 });
       
       // 添加更强力的撞墙视觉效果
-      const impactEffect = this.scene.add.particles('large_boar_sprite', {
+      const impactEffect = this.scene.add.particles(enemy.sprite.x, enemy.sprite.y, 'large_boar_sprite', {
         speed: 150,
         scale: { start: 0.4, end: 0 },
         blendMode: 'NORMAL',
@@ -974,7 +1011,6 @@ class EnemySystem {
         frequency: 8,
         quantity: 15
       });
-      impactEffect.setPosition(enemy.sprite.x, enemy.sprite.y);
       
       // 0.6秒后自动销毁粒子效果
       this.scene.time.delayedCall(600, () => {

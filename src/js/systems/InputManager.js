@@ -53,8 +53,10 @@ class InputManager {
     // 处理攻击输入
     if (this.actionKeys.attack && this.actionKeys.attack.isDown && this.scene.player && this.scene.player.canAttack) {
       const attackInfo = this.scene.player.attack();
-      this.scene.enemySystem.handlePlayerAttack(attackInfo, this.scene.player);
-      this.scene.player.startAttackCooldown();
+      // 攻击已启动，伤害判定将在动画关键帧时通过事件系统处理
+      if (attackInfo && attackInfo.initiated) {
+        console.log('Player attack initiated:', attackInfo);
+      }
     }
   }
 

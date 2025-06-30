@@ -38,10 +38,13 @@ class NPC {
    * @param {Object} player - 玩家角色
    */
   update(player) {
+    // 检查玩家对象是否存在
+    if (!player || !player.sprite) return;
+    
     // 检查玩家是否在交互范围内
     const distance = Phaser.Math.Distance.Between(
       this.sprite.x, this.sprite.y,
-      player.x, player.y
+      player.sprite.x, player.sprite.y
     );
     
     const isInRange = distance < this.interactionDistance;

@@ -41,6 +41,7 @@ const EnemyData = {
     behavior: 'territorial', // 在领地内会主动攻击玩家
     detectionRadius: 150,
     aggroRadius: 180,
+    attackRange: 40, // 攻击范围
     chargeSpeed: 150, // 冲锋速度
     chargeCooldown: 5 // 冲锋冷却时间（秒）
   },
@@ -84,6 +85,7 @@ const EnemyData = {
     behavior: 'aggressive', // 主动攻击玩家
     detectionRadius: 200,
     aggroRadius: 250,
+    attackRange: 50, // 攻击范围
     chargeSpeed: 180, // 冲锋速度
     chargeCooldown: 8, // 冲锋冷却时间（秒）
     stompRadius: 100, // 践踏影响范围
