@@ -4,7 +4,7 @@
  */
 
 import MainMenuUI from '../ui/MainMenuUI.js';
-import UIManager from '../ui/UIManager.js';
+import UIManager from '../systems/UIManager.js';
 
 class MainMenuScene extends Phaser.Scene {
   constructor() {

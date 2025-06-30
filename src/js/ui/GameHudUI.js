@@ -4,6 +4,8 @@
  */
 
 import BaseUI from './BaseUI.js';
+import configManager from '../systems/ConfigManager.js';
+import Logger from '../systems/Logger.js';
 
 class GameHudUI extends BaseUI {
   /**
@@ -13,15 +15,39 @@ class GameHudUI extends BaseUI {
   constructor(scene) {
     super(scene, 'hud');
     
-    // HUD配置
-    this.config = {
-      barWidth: 200,
-      barHeight: 20,
-      barSpacing: 10,
-      barPadding: 2,
-      skillIconSize: 40,
-      skillIconSpacing: 10
+    // 从配置管理器获取HUD配置
+    this.config = configManager.get('ui.hud');
+    
+    // 脏标记系统 - 跟踪哪些UI元素需要更新
+    this.dirtyFlags = {
+      health: true,
+      mana: true,
+      experience: true,
+      level: true,
+      class: true,
+      resources: true,
+      quest: true,
+      skills: true
     };
+    
+    // 缓存上一次的数值，用于比较变化
+    this.lastValues = {
+      health: 0,
+      maxHealth: 0,
+      mana: 0,
+      maxMana: 0,
+      experience: 0,
+      experienceToNextLevel: 0,
+      level: 0,
+      className: '',
+      gold: 0,
+      bloodEssence: 0,
+      questTitle: '',
+      questObjective: ''
+    };
+    
+    // 更新阈值
+    this.updateThreshold = this.config.updateThreshold || 0.01;
   }
 
   /**
@@ -361,29 +387,152 @@ class GameHudUI extends BaseUI {
     
     const { player, gameState } = data;
     
-    if (player) {
-      // 更新生命条
-      this.updateHealthBar(player);
+    try {
+      // 检查数据变化并设置脏标记
+      if (player) {
+        this.checkPlayerDataChanges(player);
+      }
       
-      // 更新魔法条
-      this.updateManaBar(player);
+      if (gameState) {
+        this.checkGameStateChanges(gameState);
+      }
       
-      // 更新经验条
-      this.updateExpBar(player);
+      // 只更新有变化的UI元素
+      this.updateDirtyElements(player, gameState);
       
-      // 更新等级和职业文本
-      this.updateStatusTexts(player);
+    } catch (error) {
+      logger.error('HUD更新失败', error, { source: 'GameHudUI.update' });
+    }
+  }
+  
+  /**
+   * 检查玩家数据变化
+   * @private
+   * @param {Object} player - 玩家对象
+   */
+  checkPlayerDataChanges(player) {
+    if (!player.stats) return;
+    
+    const { health, maxHealth, mana, maxMana } = player.stats;
+    const { experience, experienceToNextLevel, level } = player;
+    
+    // 检查生命值变化
+    if (Math.abs(health - this.lastValues.health) > this.updateThreshold ||
+        Math.abs(maxHealth - this.lastValues.maxHealth) > this.updateThreshold) {
+      this.dirtyFlags.health = true;
+      this.lastValues.health = health;
+      this.lastValues.maxHealth = maxHealth;
     }
     
-    if (gameState) {
-      // 更新资源显示
+    // 检查魔法值变化
+    if (Math.abs(mana - this.lastValues.mana) > this.updateThreshold ||
+        Math.abs(maxMana - this.lastValues.maxMana) > this.updateThreshold) {
+      this.dirtyFlags.mana = true;
+      this.lastValues.mana = mana;
+      this.lastValues.maxMana = maxMana;
+    }
+    
+    // 检查经验值变化
+    if (Math.abs(experience - this.lastValues.experience) > this.updateThreshold ||
+        Math.abs(experienceToNextLevel - this.lastValues.experienceToNextLevel) > this.updateThreshold) {
+      this.dirtyFlags.experience = true;
+      this.lastValues.experience = experience;
+      this.lastValues.experienceToNextLevel = experienceToNextLevel;
+    }
+    
+    // 检查等级变化
+    if (level !== this.lastValues.level) {
+      this.dirtyFlags.level = true;
+      this.lastValues.level = level;
+    }
+    
+    // 检查职业变化
+    const className = this.getClassName(player);
+    if (className !== this.lastValues.className) {
+      this.dirtyFlags.class = true;
+      this.lastValues.className = className;
+    }
+  }
+  
+  /**
+   * 检查游戏状态变化
+   * @private
+   * @param {Object} gameState - 游戏状态
+   */
+  checkGameStateChanges(gameState) {
+    // 检查资源变化
+    if (gameState.resources) {
+      const { gold, bloodEssence } = gameState.resources;
+      if (gold !== this.lastValues.gold || bloodEssence !== this.lastValues.bloodEssence) {
+        this.dirtyFlags.resources = true;
+        this.lastValues.gold = gold;
+        this.lastValues.bloodEssence = bloodEssence;
+      }
+    }
+    
+    // 检查任务变化
+    if (gameState.activeQuest) {
+      const questTitle = gameState.activeQuest.title || '';
+      const questObjective = this.getQuestObjectiveText(gameState.activeQuest);
+      
+      if (questTitle !== this.lastValues.questTitle || questObjective !== this.lastValues.questObjective) {
+        this.dirtyFlags.quest = true;
+        this.lastValues.questTitle = questTitle;
+        this.lastValues.questObjective = questObjective;
+      }
+    }
+    
+    // 检查技能冷却变化
+    if (gameState.skillCooldowns) {
+      this.dirtyFlags.skills = true; // 技能冷却变化较频繁，暂时每次都更新
+    }
+  }
+  
+  /**
+   * 更新脏元素
+   * @private
+   * @param {Object} player - 玩家对象
+   * @param {Object} gameState - 游戏状态
+   */
+  updateDirtyElements(player, gameState) {
+    if (this.dirtyFlags.health && player) {
+      this.updateHealthBar(player);
+      this.dirtyFlags.health = false;
+    }
+    
+    if (this.dirtyFlags.mana && player) {
+      this.updateManaBar(player);
+      this.dirtyFlags.mana = false;
+    }
+    
+    if (this.dirtyFlags.experience && player) {
+      this.updateExpBar(player);
+      this.dirtyFlags.experience = false;
+    }
+    
+    if (this.dirtyFlags.level && player) {
+      this.updateLevelText(player);
+      this.dirtyFlags.level = false;
+    }
+    
+    if (this.dirtyFlags.class && player) {
+      this.updateClassText(player);
+      this.dirtyFlags.class = false;
+    }
+    
+    if (this.dirtyFlags.resources && gameState) {
       this.updateResourceDisplay(gameState);
-      
-      // 更新任务追踪器
+      this.dirtyFlags.resources = false;
+    }
+    
+    if (this.dirtyFlags.quest && gameState) {
       this.updateQuestTracker(gameState);
-      
-      // 更新技能冷却
+      this.dirtyFlags.quest = false;
+    }
+    
+    if (this.dirtyFlags.skills && gameState) {
       this.updateSkillCooldowns(gameState);
+      this.dirtyFlags.skills = false;
     }
   }
 
@@ -442,30 +591,87 @@ class GameHudUI extends BaseUI {
   }
 
   /**
-   * 更新状态文本
+   * 更新等级文本
    * @param {Player} player - 玩家对象
    */
-  updateStatusTexts(player) {
+  updateLevelText(player) {
     const levelText = this.getElement('levelText');
-    const classText = this.getElement('classText');
-    
     if (levelText) {
       levelText.setText(`LV: ${player.level}`);
     }
-    
+  }
+  
+  /**
+   * 更新职业文本
+   * @param {Player} player - 玩家对象
+   */
+  updateClassText(player) {
+    const classText = this.getElement('classText');
     if (classText) {
-      let className = '未知';
-      
-      if (player.constructor.name === 'Warrior') {
-        className = '战士';
-      } else if (player.constructor.name === 'Mage') {
-        className = '法师';
-      } else if (player.constructor.name === 'Archer') {
-        className = '射手';
-      }
-      
+      const className = this.getClassName(player);
       classText.setText(`职业: ${className}`);
     }
+  }
+  
+  /**
+   * 获取职业名称
+   * @private
+   * @param {Player} player - 玩家对象
+   * @returns {string} 职业名称
+   */
+  getClassName(player) {
+    const classMap = {
+      'Warrior': '战士',
+      'Mage': '法师',
+      'Archer': '射手'
+    };
+    
+    return classMap[player.constructor.name] || '未知';
+  }
+  
+  /**
+   * 获取任务目标文本
+   * @private
+   * @param {Object} quest - 任务对象
+   * @returns {string} 任务目标文本
+   */
+  getQuestObjectiveText(quest) {
+    if (quest.objectives && quest.objectives.length > 0) {
+      const objective = quest.objectives[0];
+      return `${objective.description}: ${objective.current}/${objective.target}`;
+    }
+    return '';
+  }
+  
+  /**
+   * 强制更新所有UI元素
+   */
+  forceUpdate() {
+    // 设置所有脏标记为true
+    Object.keys(this.dirtyFlags).forEach(key => {
+      this.dirtyFlags[key] = true;
+    });
+  }
+  
+  /**
+   * 重置缓存值
+   */
+  resetCache() {
+    this.lastValues = {
+      health: 0,
+      maxHealth: 0,
+      mana: 0,
+      maxMana: 0,
+      experience: 0,
+      experienceToNextLevel: 0,
+      level: 0,
+      className: '',
+      gold: 0,
+      bloodEssence: 0,
+      questTitle: '',
+      questObjective: ''
+    };
+    this.forceUpdate();
   }
 
   /**

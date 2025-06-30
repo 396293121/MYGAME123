@@ -5,7 +5,7 @@
 
 import Warrior from '../classes/Warrior.js';
 import GameHudUI from '../ui/GameHudUI.js';
-import UIManager from '../ui/UIManager.js';
+import UIManager from '../systems/UIManager.js';
 import PauseMenuUI from '../ui/PauseMenuUI.js';
 import EnemySystem from '../systems/EnemySystem.js';
 import InputManager from '../systems/InputManager.js';
@@ -31,8 +31,8 @@ class TestScene extends Phaser.Scene {
     this.load.image('stone', 'assets/maps/tilesets/stone.png');
     
     // 加载角色精灵图 - JSON格式
-    this.load.atlas('warrior', 'assets/images/characters/warrior/sprite/warrior.png', 'assets/images/characters/warrior/sprite/warrior.json');
-    
+    // 加载新的统一战士精灵图（213x144尺寸）
+    this.load.atlas('warrior_sprite2', 'assets/images/characters/warrior/sprite/warrior_sprite2.png', 'assets/images/characters/warrior/sprite/warrior_sprite2.json');
     // 加载敌人精灵图
     this.load.spritesheet('wild_boar_sprite', 'assets/images/enemies/wild_boar_spritesheet.png', {
       frameWidth: 64,
@@ -71,6 +71,9 @@ this.load.spritesheet('items', 'assets/images/items/items_spritesheet.png', {
     
     // 初始化敌人系统并传递场景引用
     this.enemySystem = new EnemySystem(this);
+    
+    // 初始化敌人对象池（确保纹理已加载）
+    this.enemySystem.initializeEnemyPool();
     
     // 创建敌人
     this.createEnemies();

@@ -1,3 +1,5 @@
+import AnimationManager from '../systems/AnimationManager.js';
+
 /**
  * 角色基类
  * 所有职业角色的基础类
@@ -46,10 +48,25 @@ class Character {
     this.sprite.setCollideWorldBounds(true);
     
     // 动画状态
-  this.state = 'idle';
-  
-  // 创建角色动画
-  this.createAnimations();
+    this.state = 'idle';
+    
+    // 保存原始纹理键，用于特殊动画完成后恢复
+    this.originalTextureKey = texture;
+    
+    // 确定角色类型
+    this.characterType = this.determineCharacterType(texture);
+    
+    // 创建动画管理器
+    this.animationManager = new AnimationManager(scene);
+    
+    // 应用标准化配置（尺寸和锚点）
+    this.animationManager.applyStandardSize(this.sprite, this.characterType);
+    
+    // 设置物理体大小以匹配角色尺寸
+    this.setupPhysicsBody();
+    
+    // 创建角色动画
+    this.createAnimations();
   }
   
   // 更新角色状态
@@ -92,6 +109,7 @@ class Character {
         this.playAnimation('idle');
       }
     }
+
   }
   
   // 处理角色跳跃
@@ -190,18 +208,8 @@ class Character {
     // 播放攻击动画
     this.playAnimation('attack');
     
-    // 监听动画完成事件，完成后恢复到站立状态
-    this.sprite.on('animationcomplete', (animation) => {
-      if (animation.key.includes('_attack')) {
-        // 攻击动画完成后，如果角色在地面上，恢复到站立状态
-        if (this.sprite.body.onFloor()) {
-          this.playAnimation('idle');
-        } else {
-          // 如果在空中，恢复到跳跃状态
-          this.playAnimation('jump');
-        }
-      }
-    }, this);
+    // 开始攻击冷却
+    this.startAttackCooldown();
     
     return {
       damage: this.stats.physicalAttack,
@@ -357,244 +365,134 @@ class Character {
     
     return true;
   }
-    /**
-   * 创建角色动画
-   * 为角色创建各种状态的动画，如站立、移动、跳跃、攻击、受伤和死亡
+  /**
+   * 确定角色类型
+   * @param {string} textureKey - 纹理键名
+   * @returns {string} 角色类型
    */
-    createAnimations() {
-      // 获取角色纹理的键名（如'warrior', 'mage', 'archer'）
-      const textureKey = this.sprite.texture.key;
-      
-      // 如果动画已经存在，则不重复创建
-      if (this.scene.anims.exists(`${textureKey}_idle`)) return;
-      
-      // 根据角色类型创建对应的动画
-      switch(textureKey) {
-        case 'warrior':
-          // 战士站立动画 - 使用JSON格式的精灵图
-          this.scene.anims.create({
-            key: `${textureKey}_idle`,
-            frames: this.scene.anims.generateFrameNames(textureKey, {
-              prefix: '战士站立_frame_',
-              start: 1,
-              end: 20,
-              zeroPad: 6,
-              suffix: '.png'
-            }),
-            frameRate: 5,
-            repeat: -1
-          });
-          
-          // 战士移动动画 - 使用JSON格式的精灵图
-          this.scene.anims.create({
-            key: `${textureKey}_move`,
-            frames: this.scene.anims.generateFrameNames(textureKey, {
-              prefix: 'processed_frame_',
-              start: 4,
-              end: 22,
-              zeroPad: 0,
-              suffix: '.png'
-            }),
-            frameRate: 10,
-            repeat: -1
-          });
-          
-          // 注意：目前只有站立和行走两个动画，其他动画暂时不可用
-          // 战士攻击动画 - 暂时使用站立动画代替
-          this.scene.anims.create({
-            key: `${textureKey}_attack`,
-            frames: this.scene.anims.generateFrameNames(textureKey, {
-              prefix: '战士站立_frame_',
-              start: 1,
-              end: 5,
-              zeroPad: 6,
-              suffix: '.png'
-            }),
-            frameRate: 12,
-            repeat: 0
-          });
-          
-          // 战士跳跃动画 - 暂时使用站立动画代替
-          this.scene.anims.create({
-            key: `${textureKey}_jump`,
-            frames: this.scene.anims.generateFrameNames(textureKey, {
-              prefix: '战士站立_frame_',
-              start: 1,
-              end: 3,
-              zeroPad: 6,
-              suffix: '.png'
-            }),
-            frameRate: 5,
-            repeat: 0
-          });
-          
-          // 战士受伤动画 - 暂时使用站立动画代替
-          this.scene.anims.create({
-            key: `${textureKey}_hurt`,
-            frames: this.scene.anims.generateFrameNames(textureKey, {
-              prefix: '战士站立_frame_',
-              start: 1,
-              end: 2,
-              zeroPad: 6,
-              suffix: '.png'
-            }),
-            frameRate: 8,
-            repeat: 0
-          });
-          
-          
-          // 战士死亡动画 - 暂时使用站立动画代替
-          this.scene.anims.create({
-            key: `${textureKey}_die`,
-            frames: this.scene.anims.generateFrameNames(textureKey, {
-              prefix: '战士站立_frame_',
-              start: 1,
-              end: 4,
-              zeroPad: 6,
-              suffix: '.png'
-            }),
-            frameRate: 8,
-            repeat: 0
-          });
-          break;
-          
-        case 'mage':
-          // 法师站立动画
-          this.scene.anims.create({
-            key: `${textureKey}_idle`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 0, end: 3 }),
-            frameRate: 5,
-            repeat: -1
-          });
-          
-          // 法师移动动画
-          this.scene.anims.create({
-            key: `${textureKey}_move`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 4, end: 9 }),
-            frameRate: 10,
-            repeat: -1
-          });
-          
-          // 法师跳跃动画
-          this.scene.anims.create({
-            key: `${textureKey}_jump`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 10, end: 12 }),
-            frameRate: 5,
-            repeat: 0
-          });
-          
-          // 法师攻击动画
-          this.scene.anims.create({
-            key: `${textureKey}_attack`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 13, end: 16 }),
-            frameRate: 12,
-            repeat: 0
-          });
-          
-          // 法师施法动画
-          this.scene.anims.create({
-            key: `${textureKey}_cast`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 17, end: 20 }),
-            frameRate: 10,
-            repeat: 0
-          });
-          
-          // 法师受伤动画
-          this.scene.anims.create({
-            key: `${textureKey}_hurt`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 21, end: 22 }),
-            frameRate: 8,
-            repeat: 0
-          });
-          
-          // 法师死亡动画
-          this.scene.anims.create({
-            key: `${textureKey}_die`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 23, end: 26 }),
-            frameRate: 8,
-            repeat: 0
-          });
-          break;
-          
-        case 'archer':
-          // 射手站立动画
-          this.scene.anims.create({
-            key: `${textureKey}_idle`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 0, end: 3 }),
-            frameRate: 5,
-            repeat: -1
-          });
-          
-          // 射手移动动画
-          this.scene.anims.create({
-            key: `${textureKey}_move`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 4, end: 9 }),
-            frameRate: 10,
-            repeat: -1
-          });
-          
-          // 射手跳跃动画
-          this.scene.anims.create({
-            key: `${textureKey}_jump`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 10, end: 12 }),
-            frameRate: 5,
-            repeat: 0
-          });
-          
-          // 射手攻击动画
-          this.scene.anims.create({
-            key: `${textureKey}_attack`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 13, end: 16 }),
-            frameRate: 12,
-            repeat: 0
-          });
-          
-          // 射手瞄准动画
-          this.scene.anims.create({
-            key: `${textureKey}_aim`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 17, end: 19 }),
-            frameRate: 8,
-            repeat: 0
-          });
-          
-          // 射手受伤动画
-          this.scene.anims.create({
-            key: `${textureKey}_hurt`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 20, end: 21 }),
-            frameRate: 8,
-            repeat: 0
-          });
-          
-          // 射手死亡动画
-          this.scene.anims.create({
-            key: `${textureKey}_die`,
-            frames: this.scene.anims.generateFrameNumbers(textureKey, { start: 22, end: 25 }),
-            frameRate: 8,
-            repeat: 0
-          });
-          break;
-          
-        default:
-          console.warn(`未知的角色类型: ${textureKey}，无法创建动画`);  
+  determineCharacterType(textureKey) {
+    // 从纹理键名中提取角色类型
+    if (textureKey.includes('warrior')) return 'warrior';
+    if (textureKey.includes('mage')) return 'mage';
+    if (textureKey.includes('archer')) return 'archer';
+    
+    // 默认返回纹理键名
+    return textureKey;
+  }
+
+  /**
+   * 创建角色动画
+   * 使用动画管理器为角色创建各种状态的动画
+   */
+  createAnimations() {
+    this.animationManager.createAnimationsForCharacter(this.characterType);
+  }
+
+    
+  /**
+   * 播放指定动画
+   * @param {string} animationKey - 动画键名后缀，如'idle', 'move', 'attack'等
+   */
+  playAnimation(animationKey) {
+    // 使用动画管理器播放动画
+    const success = this.animationManager.playAnimation(
+      this.sprite,
+      this.characterType,
+      animationKey,
+      this.originalTextureKey,
+      () => this.onAnimationComplete(animationKey)
+    );
+    
+    if (success) {
+      this.state = animationKey;
+    }
+  }
+  
+  /**
+   * 动画完成回调
+   * @param {string} animationKey - 完成的动画键名
+   */
+  onAnimationComplete(animationKey) {
+    // 根据角色当前状态恢复相应动画
+    if (this.sprite.body.onFloor()) {
+      // 检查是否还在移动
+      if (Math.abs(this.sprite.body.velocity.x) > 0) {
+        this.playAnimation('move');
+      } else {
+        this.playAnimation('idle');
       }
+    } else {
+      this.playAnimation('jump');
+    }
+  }
+    
+  /**
+   * 检查动画是否存在
+   * @param {string} animationKey - 动画键名
+   * @returns {boolean} 动画是否存在
+   */
+  hasAnimation(animationKey) {
+    return this.animationManager.hasAnimation(this.characterType, animationKey);
+  }
+  
+  /**
+   * 检查是否为特殊动画
+   * @param {string} animationKey - 动画键名
+   * @returns {boolean} 是否为特殊动画
+   */
+  isSpecialAnimation(animationKey) {
+    return this.animationManager.isSpecialAnimation(this.characterType, animationKey);
+  }
+  
+  /**
+   * 销毁角色时清理动画管理器
+   */
+  destroy() {
+    if (this.animationManager) {
+      this.animationManager.destroy();
     }
     
-    /**
-     * 播放角色动画
-     * @param {string} animationKey - 动画键名后缀，如'idle', 'move', 'attack'等
-     */
-    playAnimation(animationKey) {
-      const textureKey = this.sprite.texture.key;
-      const fullAnimKey = `${textureKey}_${animationKey}`;
+    if (this.sprite) {
+      this.sprite.destroy();
+    }
+  }
+
+  /**
+   * 设置物理体大小和位置
+   * 使用配置化的物理体参数，确保碰撞框与实际角色尺寸匹配
+   * 简化版本：角色左右对称，不需要复杂的翻转处理
+   */
+  setupPhysicsBody() {
+    if (this.sprite && this.sprite.body) {
+      // 从动画配置中获取物理体配置
+      const config = this.animationManager.getCharacterConfig(this.characterType);
       
-      // 检查动画是否存在
-      if (this.scene.anims.exists(fullAnimKey)) {
-        this.sprite.anims.play(fullAnimKey, true);
-        this.state = animationKey;
+      if (config && config.physicsBody) {
+        const physicsConfig = config.physicsBody;
+        
+        // 设置物理体大小为实际角色尺寸
+        this.sprite.body.setSize(physicsConfig.width, physicsConfig.height);
+        
+        // 设置物理体偏移
+        // 正确的偏移计算：从精灵左边缘开始，向右偏移到物理体应该的位置
+        // spriteWidth/2: 从精灵中心到右边缘的距离（因为锚点在中心）
+        // physicsConfig.width/2: 物理体宽度的一半，用于居中对齐
+        const spriteWidth = config.standardSize.width;
+        const offsetX = physicsConfig.offsetX + (spriteWidth / 2) - (physicsConfig.width / 2);
+        // Y轴偏移：从精灵底部向上偏移到角色底部
+        const offsetY = physicsConfig.height - physicsConfig.offsetY;
+        
+        this.sprite.body.setOffset(offsetX, offsetY);
       } else {
-        console.warn(`动画 ${fullAnimKey} 不存在`);
+        // 如果没有物理体配置，使用默认值
+        console.warn(`No physics body config found for character type: ${this.characterType}`);
+        this.sprite.body.setSize(41, 94);
+        this.sprite.body.setOffset(-20.5, -144);
       }
     }
+  }
+
+
 }
 
 

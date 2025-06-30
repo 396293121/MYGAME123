@@ -9,11 +9,17 @@ import BoarKing from '../classes/enemies/BoarKing.js';
 import LargeBoar from '../classes/enemies/LargeBoar.js';
 import WildBoar from '../classes/enemies/WildBoar.js';
 import EnemyData from '../data/EnemyData.js';
+import ConfigManager from './ConfigManager.js';
+import EventBus from './EventBus.js';
+import Logger from './Logger.js';
 
 class EnemySystem {
   constructor(scene) {
     this.scene = scene;
     this.enemies = [];
+    
+    // 获取配置
+    this.config = ConfigManager.get('enemySystem');
     
     // 敌人类型映射
     this.enemyTypes = {
@@ -24,49 +30,214 @@ class EnemySystem {
       'wild_boar': WildBoar
     };
     
-    // 敌人池（用于优化性能）
-    this.enemyPool = {};
-    
-    // 初始化敌人池
-    Object.keys(this.enemyTypes).forEach(type => {
-      this.enemyPool[type] = [];
+    // 创建类型到构造函数的反向映射（优化instanceof检查）
+    this.typeByConstructor = new Map();
+    Object.entries(this.enemyTypes).forEach(([type, Constructor]) => {
+      this.typeByConstructor.set(Constructor, type);
     });
     
-    // 碰撞组
+    // 敌人池（用于优化性能）
+    this.enemyPool = {};
+    this.poolStats = {}; // 对象池统计信息
+    
+    // 敌人池将在场景准备好后初始化
+    this.poolInitialized = false;
+    
+    // 碰撞组管理
     this.colliders = [];
+    this.collisionGroups = {
+      enemies: null,
+      platforms: null,
+      player: null
+    };
     
     // 事件监听器
     this.eventListeners = [];
+    
+    // 空间分割网格（用于优化碰撞检测）
+    this.spatialGrid = {
+      cellSize: this.config.spatialGrid.cellSize,
+      grid: new Map(),
+      bounds: { x: 0, y: 0, width: 0, height: 0 }
+    };
+    
+    // 性能监控
+    this.performanceStats = {
+      poolHits: 0,
+      poolMisses: 0,
+      totalCreated: 0,
+      totalRecycled: 0
+    };
+    
+    // 绑定事件总线
+    this.setupEventListeners();
+    
+    Logger.info('EnemySystem initialized', {
+      poolSizes: this.config.objectPool.initialSizes,
+      spatialGridSize: this.config.spatialGrid.cellSize
+    });
   }
   
-  // 创建敌人
+  /**
+   * 初始化敌人对象池
+   * @public
+   */
+  initializeEnemyPool() {
+    if (this.poolInitialized) {
+      return;
+    }
+    Object.entries(this.enemyTypes).forEach(([type, EnemyClass]) => {
+      this.enemyPool[type] = [];
+      this.poolStats[type] = {
+        created: 0,
+        recycled: 0,
+        inUse: 0,
+        poolSize: 0
+      };
+      
+      // 预分配对象
+      const initialSize = this.config.objectPool.initialSizes.hasOwnProperty(type) 
+        ? this.config.objectPool.initialSizes[type] 
+        : this.config.objectPool.defaultSize;
+      for (let i = 0; i < initialSize; i++) {
+        try {
+          const enemy = new EnemyClass(this.scene, -1000, -1000); // 在屏幕外创建
+          enemy.sprite.setActive(false);
+          enemy.sprite.setVisible(false);
+          enemy.sprite.body.enable = false;
+          this.enemyPool[type].push(enemy);
+          this.poolStats[type].poolSize++;
+        } catch (error) {
+          Logger.error(`Failed to pre-allocate ${type}`, error);
+        }
+      }
+    });
+    
+    this.poolInitialized = true;
+    Logger.debug('Enemy pools initialized', this.poolStats);
+  }
+  
+  /**
+   * 设置事件监听器
+   * @private
+   */
+  setupEventListeners() {
+    // 监听配置变化
+    EventBus.on('config:enemySystem:changed', (newConfig) => {
+      this.config = newConfig;
+      Logger.debug('EnemySystem config updated', newConfig);
+    });
+    
+    // 监听性能统计请求
+    EventBus.on('enemySystem:getStats', () => {
+      EventBus.emit('enemySystem:stats', {
+        performance: this.performanceStats,
+        pools: this.poolStats,
+        activeEnemies: this.enemies.length
+      });
+    });
+  }
+  
+  /**
+   * 创建敌人
+   * @param {string} type - 敌人类型
+   * @param {number} x - X坐标
+   * @param {number} y - Y坐标
+   * @param {Object} config - 配置对象
+   * @returns {Enemy|null} 创建的敌人对象
+   */
   createEnemy(type, x, y, config = {}) {
-    // 检查类型是否有效
-    if (!this.enemyTypes[type]) {
-      console.error(`Enemy type '${type}' not found`);
+    try {
+      // 确保对象池已初始化
+      if (!this.poolInitialized) {
+        this.initializeEnemyPool();
+      }
+      
+      // 检查类型是否有效
+      if (!this.enemyTypes[type]) {
+        Logger.error(`Enemy type '${type}' not found`);
+        return null;
+      }
+      
+      let enemy;
+      let fromPool = false;
+      
+      // 尝试从对象池中获取
+      if (this.enemyPool[type].length > 0) {
+        enemy = this.enemyPool[type].pop();
+        this.resetEnemyFromPool(enemy, x, y);
+        fromPool = true;
+        this.performanceStats.poolHits++;
+        this.poolStats[type].poolSize--;
+      } else {
+        // 创建新敌人
+        const EnemyClass = this.enemyTypes[type];
+        enemy = new EnemyClass(this.scene, x, y);
+        this.performanceStats.poolMisses++;
+        this.poolStats[type].created++;
+      }
+      
+      this.performanceStats.totalCreated++;
+      this.poolStats[type].inUse++;
+      
+      // 应用配置
+      this.applyEnemyConfig(enemy, config);
+      
+      // 添加到敌人列表
+      this.enemies.push(enemy);
+      
+      // 添加到空间网格
+      this.addToSpatialGrid(enemy);
+      
+      // 发送事件
+      EventBus.emit('enemy:created', { enemy, type, fromPool });
+      
+      Logger.debug(`Enemy created: ${type}`, {
+        fromPool,
+        position: { x, y },
+        totalActive: this.enemies.length
+      });
+      
+      return enemy;
+      
+    } catch (error) {
+      Logger.error(`Failed to create enemy: ${type}`, error);
       return null;
     }
+  }
+  
+  /**
+   * 从对象池重置敌人
+   * @private
+   * @param {Enemy} enemy - 敌人对象
+   * @param {number} x - X坐标
+   * @param {number} y - Y坐标
+   */
+  resetEnemyFromPool(enemy, x, y) {
+    enemy.sprite.setPosition(x, y);
+    enemy.sprite.setActive(true);
+    enemy.sprite.setVisible(true);
+    enemy.sprite.body.enable = true;
+    enemy.sprite.alpha = 1;
     
-    let enemy;
+    // 重置敌人状态
+    enemy.health = enemy.maxHealth;
+    enemy.currentState = enemy.states.IDLE;
+    enemy.isCharging = false;
+    enemy.isStunned = false;
     
-    // 尝试从对象池中获取
-    if (this.enemyPool[type].length > 0) {
-      enemy = this.enemyPool[type].pop();
-      enemy.sprite.setPosition(x, y);
-      enemy.sprite.setActive(true);
-      enemy.sprite.setVisible(true);
-      enemy.sprite.body.enable = true;
-      
-      // 重置敌人状态
-      enemy.health = enemy.maxHealth;
-      enemy.currentState = enemy.states.IDLE;
-    } else {
-      // 创建新敌人
-      const EnemyClass = this.enemyTypes[type];
-      enemy = new EnemyClass(this.scene, x, y);
-    }
-    
-    // 应用配置
+    // 重置物理属性
+    enemy.sprite.body.setVelocity(0, 0);
+    enemy.sprite.body.setAcceleration(0, 0);
+  }
+  
+  /**
+   * 应用敌人配置
+   * @private
+   * @param {Enemy} enemy - 敌人对象
+   * @param {Object} config - 配置对象
+   */
+  applyEnemyConfig(enemy, config) {
     if (config.patrolPoints) {
       enemy.setPatrolPoints(config.patrolPoints);
     }
@@ -84,10 +255,9 @@ class EnemySystem {
       enemy.speed = config.speed;
     }
     
-    // 添加到敌人列表
-    this.enemies.push(enemy);
-    
-    return enemy;
+    if (config.scale) {
+      enemy.sprite.setScale(config.scale);
+    }
   }
   
   // 根据EnemyData创建敌人
@@ -110,49 +280,250 @@ class EnemySystem {
     return enemy;
   }
   
-  // 回收敌人（放回对象池）
+  /**
+   * 回收敌人（放回对象池）
+   * @param {Enemy} enemy - 要回收的敌人对象
+   */
   recycleEnemy(enemy) {
-    // 从敌人列表中移除
-    const index = this.enemies.indexOf(enemy);
-    if (index !== -1) {
-      this.enemies.splice(index, 1);
-    }
-    
-    // 确定敌人类型
-    let type = null;
-    for (const [key, EnemyClass] of Object.entries(this.enemyTypes)) {
-      if (enemy instanceof EnemyClass) {
-        type = key;
-        break;
+    try {
+      // 从敌人列表中移除
+      const index = this.enemies.indexOf(enemy);
+      if (index !== -1) {
+        this.enemies.splice(index, 1);
       }
-    }
-    
-    if (type) {
-      // 重置敌人状态
-      enemy.sprite.setActive(false);
-      enemy.sprite.setVisible(false);
-      enemy.sprite.body.enable = false;
       
-      // 放回对象池
-      this.enemyPool[type].push(enemy);
-    } else {
-      // 如果找不到类型，直接销毁
-      enemy.sprite.destroy();
+      // 从空间网格中移除
+      this.removeFromSpatialGrid(enemy);
+      
+      // 使用优化的类型检查
+      const type = this.typeByConstructor.get(enemy.constructor);
+      
+      if (type) {
+        // 检查对象池大小限制
+        const maxPoolSize = this.config.objectPool.maxSizes[type] || this.config.objectPool.defaultMaxSize;
+        
+        if (this.enemyPool[type].length < maxPoolSize) {
+          // 重置敌人状态
+          this.resetEnemyForPool(enemy);
+          
+          // 放回对象池
+          this.enemyPool[type].push(enemy);
+          this.poolStats[type].poolSize++;
+          this.poolStats[type].recycled++;
+          this.performanceStats.totalRecycled++;
+          
+          Logger.debug(`Enemy recycled: ${type}`, {
+            poolSize: this.enemyPool[type].length,
+            maxPoolSize
+          });
+        } else {
+          // 对象池已满，直接销毁
+          enemy.sprite.destroy();
+          Logger.debug(`Enemy destroyed (pool full): ${type}`);
+        }
+      } else {
+        // 如果找不到类型，直接销毁
+        enemy.sprite.destroy();
+        Logger.warn('Enemy type not found for recycling', enemy.constructor.name);
+      }
+      
+      // 更新统计信息
+      if (type && this.poolStats[type]) {
+        this.poolStats[type].inUse--;
+      }
+      
+      // 发送事件
+      EventBus.emit('enemy:recycled', { enemy, type });
+      
+    } catch (error) {
+      Logger.error('Failed to recycle enemy', error);
+      // 确保敌人被销毁
+      if (enemy && enemy.sprite) {
+        enemy.sprite.destroy();
+      }
     }
   }
   
-  // 更新所有敌人
-  update(time, delta, player) {
-    for (let i = this.enemies.length - 1; i >= 0; i--) {
-      const enemy = this.enemies[i];
-      
-      // 更新敌人状态
-      enemy.update(time, delta, player);
-      
-      // 如果敌人已死亡且动画已完成，回收敌人
-      if (enemy.currentState === enemy.states.DEAD && enemy.sprite.alpha === 0) {
-        this.recycleEnemy(enemy);
+  /**
+   * 重置敌人状态以便回收
+   * @private
+   * @param {Enemy} enemy - 敌人对象
+   */
+  resetEnemyForPool(enemy) {
+    enemy.sprite.setActive(false);
+    enemy.sprite.setVisible(false);
+    enemy.sprite.body.enable = false;
+    enemy.sprite.setPosition(-1000, -1000); // 移到屏幕外
+    
+    // 清除所有状态
+    enemy.currentState = enemy.states.IDLE;
+    enemy.isCharging = false;
+    enemy.isStunned = false;
+    enemy.health = enemy.maxHealth;
+    
+    // 清除物理状态
+    enemy.sprite.body.setVelocity(0, 0);
+    enemy.sprite.body.setAcceleration(0, 0);
+    
+    // 清除视觉效果
+    enemy.sprite.clearTint();
+    enemy.sprite.setAlpha(1);
+    enemy.sprite.setScale(1);
+  }
+  
+  /**
+   * 添加敌人到空间网格
+   * @private
+   * @param {Enemy} enemy - 敌人对象
+   */
+  addToSpatialGrid(enemy) {
+    if (!this.config.spatialGrid.enabled) return;
+    
+    const cellX = Math.floor(enemy.sprite.x / this.spatialGrid.cellSize);
+    const cellY = Math.floor(enemy.sprite.y / this.spatialGrid.cellSize);
+    const cellKey = `${cellX},${cellY}`;
+    
+    if (!this.spatialGrid.grid.has(cellKey)) {
+      this.spatialGrid.grid.set(cellKey, new Set());
+    }
+    
+    this.spatialGrid.grid.get(cellKey).add(enemy);
+    enemy._gridCell = cellKey;
+  }
+  
+  /**
+   * 从空间网格移除敌人
+   * @private
+   * @param {Enemy} enemy - 敌人对象
+   */
+  removeFromSpatialGrid(enemy) {
+    if (!this.config.spatialGrid.enabled || !enemy._gridCell) return;
+    
+    const cell = this.spatialGrid.grid.get(enemy._gridCell);
+    if (cell) {
+      cell.delete(enemy);
+      if (cell.size === 0) {
+        this.spatialGrid.grid.delete(enemy._gridCell);
       }
+    }
+    
+    delete enemy._gridCell;
+  }
+  
+  /**
+   * 更新敌人在空间网格中的位置
+   * @private
+   * @param {Enemy} enemy - 敌人对象
+   */
+  updateSpatialGrid(enemy) {
+    if (!this.config.spatialGrid.enabled) return;
+    
+    const cellX = Math.floor(enemy.sprite.x / this.spatialGrid.cellSize);
+    const cellY = Math.floor(enemy.sprite.y / this.spatialGrid.cellSize);
+    const newCellKey = `${cellX},${cellY}`;
+    
+    if (enemy._gridCell !== newCellKey) {
+      this.removeFromSpatialGrid(enemy);
+      enemy._gridCell = newCellKey;
+      
+      if (!this.spatialGrid.grid.has(newCellKey)) {
+        this.spatialGrid.grid.set(newCellKey, new Set());
+      }
+      
+      this.spatialGrid.grid.get(newCellKey).add(enemy);
+    }
+  }
+  
+  /**
+   * 获取指定区域内的敌人（使用空间网格优化）
+   * @param {number} x - 中心X坐标
+   * @param {number} y - 中心Y坐标
+   * @param {number} range - 范围
+   * @returns {Array<Enemy>} 范围内的敌人列表
+   */
+  getEnemiesInRangeOptimized(x, y, range) {
+    if (!this.config.spatialGrid.enabled) {
+      return this.getEnemiesInRange(x, y, range);
+    }
+    
+    const enemies = [];
+    const cellSize = this.spatialGrid.cellSize;
+    const cellRange = Math.ceil(range / cellSize);
+    
+    const centerCellX = Math.floor(x / cellSize);
+    const centerCellY = Math.floor(y / cellSize);
+    
+    // 检查周围的网格单元
+    for (let dx = -cellRange; dx <= cellRange; dx++) {
+      for (let dy = -cellRange; dy <= cellRange; dy++) {
+        const cellKey = `${centerCellX + dx},${centerCellY + dy}`;
+        const cell = this.spatialGrid.grid.get(cellKey);
+        
+        if (cell) {
+          cell.forEach(enemy => {
+            if (enemy.currentState !== enemy.states.DEAD) {
+              const distance = Phaser.Math.Distance.Between(
+                x, y, enemy.sprite.x, enemy.sprite.y
+              );
+              if (distance <= range) {
+                enemies.push(enemy);
+              }
+            }
+          });
+        }
+      }
+    }
+    
+    return enemies;
+  }
+  
+  /**
+   * 更新所有敌人
+   * @param {number} time - 当前时间
+   * @param {number} delta - 时间差
+   * @param {Player} player - 玩家对象
+   */
+  update(time, delta, player) {
+    try {
+      const startTime = performance.now();
+      
+      for (let i = this.enemies.length - 1; i >= 0; i--) {
+        const enemy = this.enemies[i];
+        
+        // 更新敌人状态
+        enemy.update(time, delta, player);
+        
+        // 更新空间网格位置
+        this.updateSpatialGrid(enemy);
+        
+        // 如果敌人已死亡且动画已完成，回收敌人
+        if (enemy.currentState === enemy.states.DEAD && enemy.sprite.alpha === 0) {
+          this.recycleEnemy(enemy);
+        }
+      }
+      
+      // 性能监控
+      const updateTime = performance.now() - startTime;
+      if (updateTime > this.config.performance.maxUpdateTime) {
+        Logger.warn('EnemySystem update took too long', {
+          updateTime,
+          enemyCount: this.enemies.length,
+          threshold: this.config.performance.maxUpdateTime
+        });
+      }
+      
+      // 定期发送性能统计
+      if (time % this.config.performance.statsInterval < delta) {
+        EventBus.emit('enemySystem:performance', {
+          updateTime,
+          enemyCount: this.enemies.length,
+          poolStats: this.poolStats,
+          performanceStats: this.performanceStats
+        });
+      }
+      
+    } catch (error) {
+      Logger.error('Error in EnemySystem update', error);
     }
   }
   
@@ -187,25 +558,64 @@ class EnemySystem {
     });
   }
   
-  // 清除所有敌人
+  /**
+   * 清除所有敌人
+   */
   clearAllEnemies() {
-    for (let i = this.enemies.length - 1; i >= 0; i--) {
-      const enemy = this.enemies[i];
-      enemy.sprite.destroy();
-    }
-    
-    this.enemies = [];
-    
-    // 清空对象池
-    Object.keys(this.enemyPool).forEach(type => {
-      this.enemyPool[type].forEach(enemy => {
-        enemy.sprite.destroy();
+    try {
+      // 清除活动敌人
+      for (let i = this.enemies.length - 1; i >= 0; i--) {
+        const enemy = this.enemies[i];
+        this.removeFromSpatialGrid(enemy);
+        if (enemy.sprite && !enemy.sprite.destroyed) {
+          enemy.sprite.destroy();
+        }
+      }
+      
+      this.enemies = [];
+      
+      // 清空对象池
+      Object.keys(this.enemyPool).forEach(type => {
+        this.enemyPool[type].forEach(enemy => {
+          if (enemy.sprite && !enemy.sprite.destroyed) {
+            enemy.sprite.destroy();
+          }
+        });
+        this.enemyPool[type] = [];
+        this.poolStats[type] = {
+          created: 0,
+          recycled: 0,
+          inUse: 0,
+          poolSize: 0
+        };
       });
-      this.enemyPool[type] = [];
-    });
+      
+      // 清空空间网格
+      this.spatialGrid.grid.clear();
+      
+      // 重置性能统计
+      this.performanceStats = {
+        poolHits: 0,
+        poolMisses: 0,
+        totalCreated: 0,
+        totalRecycled: 0
+      };
+      
+      Logger.info('All enemies cleared');
+      EventBus.emit('enemySystem:cleared');
+      
+    } catch (error) {
+      Logger.error('Error clearing enemies', error);
+    }
   }
   
-  // 获取指定范围内的敌人
+  /**
+   * 获取指定范围内的敌人（传统方法，作为备用）
+   * @param {number} x - 中心X坐标
+   * @param {number} y - 中心Y坐标
+   * @param {number} range - 范围
+   * @returns {Array<Enemy>} 范围内的敌人列表
+   */
   getEnemiesInRange(x, y, range) {
     return this.enemies.filter(enemy => {
       const distance = Phaser.Math.Distance.Between(
@@ -216,15 +626,40 @@ class EnemySystem {
     });
   }
   
-  // 对指定范围内的敌人造成伤害
+  /**
+   * 对指定范围内的敌人造成伤害（使用优化的范围查找）
+   * @param {number} x - 中心X坐标
+   * @param {number} y - 中心Y坐标
+   * @param {number} range - 范围
+   * @param {number} damage - 伤害值
+   * @param {string} damageType - 伤害类型
+   * @returns {number} 受影响的敌人数量
+   */
   damageEnemiesInRange(x, y, range, damage, damageType = 'physical') {
-    const affectedEnemies = this.getEnemiesInRange(x, y, range);
-    
-    affectedEnemies.forEach(enemy => {
-      enemy.takeDamage(damage, damageType);
-    });
-    
-    return affectedEnemies.length;
+    try {
+      const affectedEnemies = this.getEnemiesInRangeOptimized(x, y, range);
+      
+      affectedEnemies.forEach(enemy => {
+        enemy.takeDamage(damage, damageType);
+      });
+      
+      // 发送事件
+      if (affectedEnemies.length > 0) {
+        EventBus.emit('enemies:damaged', {
+          position: { x, y },
+          range,
+          damage,
+          damageType,
+          count: affectedEnemies.length
+        });
+      }
+      
+      return affectedEnemies.length;
+      
+    } catch (error) {
+      Logger.error('Error in damageEnemiesInRange', error);
+      return 0;
+    }
   }
   
   /**
@@ -562,31 +997,94 @@ class EnemySystem {
    * 清除所有碰撞
    */
   clearColliders() {
-    this.colliders.forEach(collider => {
-      if (collider && collider.active) {
-        collider.destroy();
-      }
-    });
-    this.colliders = [];
+    try {
+      this.colliders.forEach(collider => {
+        if (collider && collider.active && !collider.destroyed) {
+          collider.destroy();
+        }
+      });
+      this.colliders = [];
+      
+      // 清除碰撞组
+      Object.keys(this.collisionGroups).forEach(key => {
+        this.collisionGroups[key] = null;
+      });
+      
+      Logger.debug('All colliders cleared');
+      
+    } catch (error) {
+      Logger.error('Error clearing colliders', error);
+    }
   }
   
   /**
    * 清除所有事件监听器
    */
   clearEventListeners() {
-    this.eventListeners.forEach(({ event, listener }) => {
-      this.scene.events.off(event, listener);
-    });
-    this.eventListeners = [];
+    try {
+      // 清除场景事件监听器
+      this.eventListeners.forEach(({ event, listener }) => {
+        this.scene.events.off(event, listener);
+      });
+      this.eventListeners = [];
+      
+      // 清除事件总线监听器
+      EventBus.off('config:enemySystem:changed');
+      EventBus.off('enemySystem:getStats');
+      
+      Logger.debug('All event listeners cleared');
+      
+    } catch (error) {
+      Logger.error('Error clearing event listeners', error);
+    }
+  }
+  
+  /**
+   * 获取系统统计信息
+   * @returns {Object} 统计信息对象
+   */
+  getStats() {
+    return {
+      activeEnemies: this.enemies.length,
+      poolStats: { ...this.poolStats },
+      performanceStats: { ...this.performanceStats },
+      spatialGridCells: this.spatialGrid.grid.size,
+      colliders: this.colliders.length,
+      eventListeners: this.eventListeners.length
+    };
   }
   
   /**
    * 清理系统资源
    */
   destroy() {
-    this.clearAllEnemies();
-    this.clearColliders();
-    this.clearEventListeners();
+    try {
+      Logger.info('Destroying EnemySystem');
+      
+      // 清除所有敌人和对象池
+      this.clearAllEnemies();
+      
+      // 清除碰撞检测
+      this.clearColliders();
+      
+      // 清除事件监听器
+      this.clearEventListeners();
+      
+      // 清空引用
+      this.scene = null;
+      this.config = null;
+      this.enemyTypes = null;
+      this.typeByConstructor.clear();
+      this.spatialGrid.grid.clear();
+      
+      // 发送销毁事件
+      EventBus.emit('enemySystem:destroyed');
+      
+      Logger.info('EnemySystem destroyed successfully');
+      
+    } catch (error) {
+      Logger.error('Error destroying EnemySystem', error);
+    }
   }
 }
 

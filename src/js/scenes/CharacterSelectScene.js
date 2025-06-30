@@ -5,7 +5,7 @@
  */
 
 import CharacterSelectUI from '../ui/CharacterSelectUI.js';
-import UIManager from '../ui/UIManager.js';
+import UIManager from '../systems/UIManager.js';
 
 class CharacterSelectScene extends Phaser.Scene {
   constructor() {

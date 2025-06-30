@@ -1,0 +1,1868 @@
+{
+	"textures": [
+		{
+			"image": "warrior_sprite2.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1935,
+				"h": 1460
+			},
+			"scale": 0.15,
+			"frames": [
+				{
+					"filename": "战士攻击_frame_000001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士攻击_frame_000002.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 216,
+						"y": 1,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士攻击_frame_000003.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 431,
+						"y": 1,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士攻击_frame_000004.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 646,
+						"y": 1,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士攻击_frame_000005.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 861,
+						"y": 1,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士攻击_frame_000006.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1076,
+						"y": 1,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士攻击_frame_000007.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1291,
+						"y": 1,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士攻击_frame_000009.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1506,
+						"y": 1,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士攻击_frame_000010.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1721,
+						"y": 1,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士攻击_frame_000011.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1,
+						"y": 147,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士攻击_frame_000012.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 216,
+						"y": 147,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士攻击_frame_000013.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 431,
+						"y": 147,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 646,
+						"y": 147,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000002.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 861,
+						"y": 147,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000003.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1076,
+						"y": 147,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000004.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1291,
+						"y": 147,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000005.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1506,
+						"y": 147,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000006.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1721,
+						"y": 147,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000007.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1,
+						"y": 293,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000008.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 216,
+						"y": 293,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000009.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 431,
+						"y": 293,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000010.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 646,
+						"y": 293,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000011.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 861,
+						"y": 293,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000012.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1076,
+						"y": 293,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000013.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1291,
+						"y": 293,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000014.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1506,
+						"y": 293,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000015.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1721,
+						"y": 293,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000016.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1,
+						"y": 439,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000017.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 216,
+						"y": 439,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000018.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 431,
+						"y": 439,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000019.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 646,
+						"y": 439,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000020.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 861,
+						"y": 439,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000021.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1076,
+						"y": 439,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000022.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1291,
+						"y": 439,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000023.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1506,
+						"y": 439,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000024.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1721,
+						"y": 439,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000025.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1,
+						"y": 585,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000026.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 216,
+						"y": 585,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000027.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 431,
+						"y": 585,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000028.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 646,
+						"y": 585,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000029.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 861,
+						"y": 585,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士站立_frame_000030.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1076,
+						"y": 585,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1291,
+						"y": 585,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000002.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1506,
+						"y": 585,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000003.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1721,
+						"y": 585,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000004.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1,
+						"y": 731,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000005.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 216,
+						"y": 731,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000006.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 431,
+						"y": 731,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000007.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 646,
+						"y": 731,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000008.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 861,
+						"y": 731,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000009.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1076,
+						"y": 731,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000010.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1291,
+						"y": 731,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000011.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1506,
+						"y": 731,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000012.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1721,
+						"y": 731,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000013.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1,
+						"y": 877,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000014.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 216,
+						"y": 877,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000015.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 431,
+						"y": 877,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000016.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 646,
+						"y": 877,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000017.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 861,
+						"y": 877,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000018.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1076,
+						"y": 877,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000019.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1291,
+						"y": 877,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000021.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1506,
+						"y": 877,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000022.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1721,
+						"y": 877,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000023.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1,
+						"y": 1023,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000024.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 216,
+						"y": 1023,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000025.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 431,
+						"y": 1023,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000026.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 646,
+						"y": 1023,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000027.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 861,
+						"y": 1023,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000028.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1076,
+						"y": 1023,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000029.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1291,
+						"y": 1023,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士行走_frame_000030.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1506,
+						"y": 1023,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1721,
+						"y": 1023,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000002.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1,
+						"y": 1169,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000003.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 216,
+						"y": 1169,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000004.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 431,
+						"y": 1169,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000005.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 646,
+						"y": 1169,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000006.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 861,
+						"y": 1169,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000007.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1076,
+						"y": 1169,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000008.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1291,
+						"y": 1169,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000009.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1506,
+						"y": 1169,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000010.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1721,
+						"y": 1169,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000011.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1,
+						"y": 1315,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000012.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 216,
+						"y": 1315,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000013.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 431,
+						"y": 1315,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000014.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 646,
+						"y": 1315,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000015.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 861,
+						"y": 1315,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000016.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1076,
+						"y": 1315,
+						"w": 213,
+						"h": 144
+					}
+				},
+				{
+					"filename": "战士跳跃_frame_000017.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 213,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 213,
+						"h": 144
+					},
+					"frame": {
+						"x": 1291,
+						"y": 1315,
+						"w": 213,
+						"h": 144
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:cf31f00d213a2e970232fd4f6225c6d6:3e755b07ab794814361e496926e49c89:e1ba5d92b0f89611c90d3a12eef6b023$"
+	}
+}
