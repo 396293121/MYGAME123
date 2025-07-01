@@ -12,7 +12,7 @@ class Warrior extends Character {
     // 战士特有属性调整
     this.attributes = {
       strength: 8,      // 战士起始力量更高
-      agility: 41,       // 战士敏捷较低
+      agility: 4,       // 战士敏捷较低
       vitality: 7,      // 战士体力较高
       intelligence: 3   // 战士智力较低
     };

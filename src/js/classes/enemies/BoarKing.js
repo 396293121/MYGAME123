@@ -4,120 +4,120 @@
  */
 import Enemy from '../Enemy.js';
 import WildBoar from './WildBoar.js';
-import EnemyData from '../../data/EnemyData.js';
+import EnemyConfig from '../../data/EnemyConfig.js';
 
 class BoarKing extends Enemy {
   constructor(scene, x, y) {
-    super(scene, x, y, EnemyData.BOAR_KING.sprite, 0);
+    super(scene, x, y, EnemyConfig.BOAR_KING.sprite, 0);
     
-    // 从EnemyData获取猪王特有属性
-    this.health = EnemyData.BOAR_KING.stats.health;
-    this.maxHealth = EnemyData.BOAR_KING.stats.health;
-    this.damage = EnemyData.BOAR_KING.stats.attack;
-    this.defense = EnemyData.BOAR_KING.stats.defense;
-    this.speed = EnemyData.BOAR_KING.stats.speed;
-    this.exp = EnemyData.BOAR_KING.stats.exp;
+    // 从EnemyConfig获取猪王特有属性
+    this.health = EnemyConfig.BOAR_KING.stats.health;
+    this.maxHealth = EnemyConfig.BOAR_KING.stats.health;
+    this.damage = EnemyConfig.BOAR_KING.stats.attack;
+    this.defense = EnemyConfig.BOAR_KING.stats.defense;
+    this.speed = EnemyConfig.BOAR_KING.stats.speed;
+    this.exp = EnemyConfig.BOAR_KING.stats.exp;
     
-    // 从EnemyData获取技能相关属性
-    this.chargeSpeed = EnemyData.BOAR_KING.chargeSpeed;
-    this.chargeDamage = EnemyData.BOAR_KING.chargeDamage;
-    this.chargeCooldown = EnemyData.BOAR_KING.chargeCooldown * 1000; // 转换为毫秒
+    // 从EnemyConfig获取技能相关属性
+    this.chargeSpeed = EnemyConfig.BOAR_KING.chargeSpeed;
+    this.chargeDamage = EnemyConfig.BOAR_KING.chargeDamage;
+    this.chargeCooldown = EnemyConfig.BOAR_KING.chargeCooldown * 1000; // 转换为毫秒
     this.canCharge = true;
     this.isCharging = false;
     
-    this.quakeRadius = EnemyData.BOAR_KING.quakeRadius;
-    this.quakeDamage = EnemyData.BOAR_KING.quakeDamage;
-    this.quakeCooldown = EnemyData.BOAR_KING.quakeCooldown * 1000; // 转换为毫秒
+    this.quakeRadius = EnemyConfig.BOAR_KING.quakeRadius;
+    this.quakeDamage = EnemyConfig.BOAR_KING.quakeDamage;
+    this.quakeCooldown = EnemyConfig.BOAR_KING.quakeCooldown * 1000; // 转换为毫秒
     this.canQuake = true;
     
-    this.summonType = EnemyData.BOAR_KING.summonType;
-    this.summonCount = EnemyData.BOAR_KING.summonCount;
-    this.summonCooldown = EnemyData.BOAR_KING.summonCooldown * 1000; // 转换为毫秒
+    this.summonType = EnemyConfig.BOAR_KING.summonType;
+    this.summonCount = EnemyConfig.BOAR_KING.summonCount;
+    this.summonCooldown = EnemyConfig.BOAR_KING.summonCooldown * 1000; // 转换为毫秒
     this.canSummon = true;
     
-    // 从EnemyData获取阶段性行为属性
+    // 从EnemyConfig获取阶段性行为属性
     this.phase = 1;
-    this.phaseThreshold = EnemyData.BOAR_KING.phases[0].threshold; // 阶段转换阈值
-    this.enrageThreshold = EnemyData.BOAR_KING.enrageThreshold; // 狂暴阈值
+    this.phaseThreshold = EnemyConfig.BOAR_KING.phases[0].threshold; // 阶段转换阈值
+    this.enrageThreshold = EnemyConfig.BOAR_KING.enrageThreshold; // 狂暴阈值
     this.isEnraged = false;
     
-    // 从EnemyData获取抗性
-    this.resistances = EnemyData.BOAR_KING.resistances;
+    // 从EnemyConfig获取抗性
+    this.resistances = EnemyConfig.BOAR_KING.resistances;
     
     // 设置物理属性
     this.sprite.setBounce(0.1);
     this.sprite.setScale(1.8); // 猪王体型更大
     
     // 设置动画
-    if (!scene.anims.exists(EnemyData.BOAR_KING.animations.idle)) {
+    if (!scene.anims.exists(EnemyConfig.BOAR_KING.animations.idle)) {
       scene.anims.create({
-        key: EnemyData.BOAR_KING.animations.idle,
-        frames: scene.anims.generateFrameNumbers(EnemyData.BOAR_KING.sprite, { start: 0, end: 1 }),
+        key: EnemyConfig.BOAR_KING.animations.idle,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.BOAR_KING.sprite, { start: 0, end: 1 }),
         frameRate: 2,
         repeat: -1
       });
       
       scene.anims.create({
-        key: EnemyData.BOAR_KING.animations.move,
-        frames: scene.anims.generateFrameNumbers(EnemyData.BOAR_KING.sprite, { start: 2, end: 5 }),
+        key: EnemyConfig.BOAR_KING.animations.move,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.BOAR_KING.sprite, { start: 2, end: 5 }),
         frameRate: 8,
         repeat: -1
       });
       
       scene.anims.create({
-        key: EnemyData.BOAR_KING.animations.attack,
-        frames: scene.anims.generateFrameNumbers(EnemyData.BOAR_KING.sprite, { start: 6, end: 9 }),
+        key: EnemyConfig.BOAR_KING.animations.attack,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.BOAR_KING.sprite, { start: 6, end: 9 }),
         frameRate: 10,
         repeat: 0
       });
       
       scene.anims.create({
-        key: EnemyData.BOAR_KING.animations.fierceCharge,
-        frames: scene.anims.generateFrameNumbers(EnemyData.BOAR_KING.sprite, { start: 10, end: 13 }),
+        key: EnemyConfig.BOAR_KING.animations.fierceCharge,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.BOAR_KING.sprite, { start: 10, end: 13 }),
         frameRate: 12,
         repeat: -1
       });
       
       scene.anims.create({
-        key: EnemyData.BOAR_KING.animations.tuskSlash,
-        frames: scene.anims.generateFrameNumbers(EnemyData.BOAR_KING.sprite, { start: 14, end: 17 }),
+        key: EnemyConfig.BOAR_KING.animations.tuskSlash,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.BOAR_KING.sprite, { start: 14, end: 17 }),
         frameRate: 12,
         repeat: 0
       });
       
       scene.anims.create({
-        key: EnemyData.BOAR_KING.animations.groundQuake,
-        frames: scene.anims.generateFrameNumbers(EnemyData.BOAR_KING.sprite, { start: 18, end: 22 }),
+        key: EnemyConfig.BOAR_KING.animations.groundQuake,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.BOAR_KING.sprite, { start: 18, end: 22 }),
         frameRate: 10,
         repeat: 0
       });
       
       scene.anims.create({
-        key: EnemyData.BOAR_KING.animations.summon,
-        frames: scene.anims.generateFrameNumbers(EnemyData.BOAR_KING.sprite, { start: 23, end: 26 }),
+        key: EnemyConfig.BOAR_KING.animations.summon,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.BOAR_KING.sprite, { start: 23, end: 26 }),
         frameRate: 8,
         repeat: 0
       });
       
       scene.anims.create({
-        key: EnemyData.BOAR_KING.animations.enrage,
-        frames: scene.anims.generateFrameNumbers(EnemyData.BOAR_KING.sprite, { start: 27, end: 30 }),
+        key: EnemyConfig.BOAR_KING.animations.enrage,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.BOAR_KING.sprite, { start: 27, end: 30 }),
         frameRate: 10,
         repeat: 0
       });
     }
     
     // 播放默认动画
-    this.sprite.anims.play(EnemyData.BOAR_KING.animations.idle, true);
+    this.sprite.anims.play(EnemyConfig.BOAR_KING.animations.idle, true);
     
     // 设置行为模式
-    this.behavior = EnemyData.BOAR_KING.behavior; // 从EnemyData获取行为模式
-    this.detectionRange = EnemyData.BOAR_KING.detectionRadius;
-    this.aggroRadius = EnemyData.BOAR_KING.aggroRadius;
+    this.behavior = EnemyConfig.BOAR_KING.behavior; // 从EnemyConfig获取行为模式
+    this.detectionRange = EnemyConfig.BOAR_KING.detectionRadius;
+    this.aggroRadius = EnemyConfig.BOAR_KING.aggroRadius;
     
     // 播放Boss音乐
     if (scene.game.gameManager && !scene.game.gameManager.isBossMusicPlaying) {
-      scene.game.gameManager.playBossMusic(EnemyData.BOAR_KING.music);
+      scene.game.gameManager.playBossMusic(EnemyConfig.BOAR_KING.music);
     }
   }
   
@@ -131,9 +131,9 @@ class BoarKing extends Enemy {
     // 更新动画
     if (!this.isCharging && !this.isQuaking && !this.isSummoning && !this.isSlashing) {
       if (this.currentState === this.states.IDLE) {
-        this.sprite.anims.play(EnemyData.BOAR_KING.animations.idle, true);
+        this.sprite.anims.play(EnemyConfig.BOAR_KING.animations.idle, true);
       } else if (this.currentState === this.states.PATROL || this.currentState === this.states.CHASE) {
-        this.sprite.anims.play(EnemyData.BOAR_KING.animations.move, true);
+        this.sprite.anims.play(EnemyConfig.BOAR_KING.animations.move, true);
       }
     }
     
@@ -209,10 +209,10 @@ class BoarKing extends Enemy {
     this.isEnraged = true;
     
     // 播放狂暴动画
-    this.sprite.anims.play(EnemyData.BOAR_KING.animations.enrage, true);
+    this.sprite.anims.play(EnemyConfig.BOAR_KING.animations.enrage, true);
     
     // 播放狂暴音效
-    this.scene.sound.play(EnemyData.BOAR_KING.soundEffects.enrage);
+    this.scene.sound.play(EnemyConfig.BOAR_KING.soundEffects.enrage);
     
     // 相机震动效果
     this.scene.cameras.main.shake(1000, 0.02);
@@ -247,10 +247,10 @@ class BoarKing extends Enemy {
     this.sprite.setVelocityY(Math.sin(angle) * this.chargeSpeed);
     
     // 播放冲锋动画
-    this.sprite.anims.play(EnemyData.BOAR_KING.animations.fierceCharge, true);
+    this.sprite.anims.play(EnemyConfig.BOAR_KING.animations.fierceCharge, true);
     
     // 播放冲锋音效
-    this.scene.sound.play(EnemyData.BOAR_KING.soundEffects.fierceCharge);
+    this.scene.sound.play(EnemyConfig.BOAR_KING.soundEffects.fierceCharge);
     
     // 设置冲锋状态
     this.isCharging = true;
@@ -313,10 +313,10 @@ class BoarKing extends Enemy {
     this.isSlashing = true;
     
     // 播放斩击动画
-    this.sprite.anims.play(EnemyData.BOAR_KING.animations.tuskSlash, true);
+    this.sprite.anims.play(EnemyConfig.BOAR_KING.animations.tuskSlash, true);
     
     // 播放斩击音效
-    this.scene.sound.play(EnemyData.BOAR_KING.soundEffects.tuskSlash);
+    this.scene.sound.play(EnemyConfig.BOAR_KING.soundEffects.tuskSlash);
     
     // 创建斩击效果
     const slashEffect = this.scene.add.sprite(
@@ -373,10 +373,10 @@ class BoarKing extends Enemy {
     this.isQuaking = true;
     
     // 播放地震动画
-    this.sprite.anims.play(EnemyData.BOAR_KING.animations.groundQuake, true);
+    this.sprite.anims.play(EnemyConfig.BOAR_KING.animations.groundQuake, true);
     
     // 播放地震音效
-    this.scene.sound.play(EnemyData.BOAR_KING.soundEffects.groundQuake);
+    this.scene.sound.play(EnemyConfig.BOAR_KING.soundEffects.groundQuake);
     
     // 相机震动效果
     this.scene.cameras.main.shake(1000, 0.03);
@@ -446,10 +446,10 @@ class BoarKing extends Enemy {
     this.isSummoning = true;
     
     // 播放召唤动画
-    this.sprite.anims.play(EnemyData.BOAR_KING.animations.summon, true);
+    this.sprite.anims.play(EnemyConfig.BOAR_KING.animations.summon, true);
     
     // 播放召唤音效
-    this.scene.sound.play(EnemyData.BOAR_KING.soundEffects.summon);
+    this.scene.sound.play(EnemyConfig.BOAR_KING.soundEffects.summon);
     
     // 创建召唤效果
     const summonEffect = this.scene.add.sprite(
@@ -515,10 +515,10 @@ class BoarKing extends Enemy {
       this.tuskSlash(player);
     } else {
       // 普通攻击
-      this.sprite.anims.play(EnemyData.BOAR_KING.animations.attack, true);
+      this.sprite.anims.play(EnemyConfig.BOAR_KING.animations.attack, true);
       
       // 播放攻击音效
-      this.scene.sound.play(EnemyData.BOAR_KING.soundEffects.attack);
+      this.scene.sound.play(EnemyConfig.BOAR_KING.soundEffects.attack);
       
       // 如果与玩家接触，造成伤害
       const distance = Phaser.Math.Distance.Between(
@@ -571,7 +571,7 @@ class BoarKing extends Enemy {
   // 重写死亡方法
   die() {
     // 猪王死亡时的特殊效果
-    this.scene.sound.play(EnemyData.BOAR_KING.soundEffects.die);
+    this.scene.sound.play(EnemyConfig.BOAR_KING.soundEffects.die);
     
     // 强烈的地面震动效果
     this.scene.cameras.main.shake(2000, 0.04);

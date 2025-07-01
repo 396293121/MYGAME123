@@ -255,5 +255,4 @@ class AnimationManager {
   }
 }
 
-export { AnimationManager };
 export default AnimationManager;

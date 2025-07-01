@@ -3,35 +3,35 @@
  * 体型更大、更加凶猛的野猪，通常是野猪群的领袖
  */
 import Enemy from '../Enemy.js';
-import EnemyData from '../../data/EnemyData.js';
+import EnemyConfig from '../../data/EnemyConfig.js';
 
 class LargeBoar extends Enemy {
   constructor(scene, x, y) {
-    super(scene, x, y, EnemyData.LARGE_BOAR.sprite, 0);
+    super(scene, x, y, EnemyConfig.LARGE_BOAR.sprite, 0);
     
-    // 从EnemyData获取大型野猪特有属性
-    this.health = EnemyData.LARGE_BOAR.stats.health;
-    this.maxHealth = EnemyData.LARGE_BOAR.stats.health;
-    this.damage = EnemyData.LARGE_BOAR.stats.attack;
-    this.defense = EnemyData.LARGE_BOAR.stats.defense;
-    this.speed = EnemyData.LARGE_BOAR.stats.speed;
-    this.exp = EnemyData.LARGE_BOAR.stats.exp;
+    // 从EnemyConfig获取大型野猪特有属性
+    this.health = EnemyConfig.LARGE_BOAR.stats.health;
+    this.maxHealth = EnemyConfig.LARGE_BOAR.stats.health;
+    this.damage = EnemyConfig.LARGE_BOAR.stats.attack;
+    this.defense = EnemyConfig.LARGE_BOAR.stats.defense;
+    this.speed = EnemyConfig.LARGE_BOAR.stats.speed;
+    this.exp = EnemyConfig.LARGE_BOAR.stats.exp;
     
-    // 从EnemyData设置检测和攻击范围
-    this.detectionRange = EnemyData.LARGE_BOAR.detectionRadius || 200;
-    this.attackRange = EnemyData.LARGE_BOAR.attackRange || 60;
+    // 从EnemyConfig设置检测和攻击范围
+    this.detectionRange = EnemyConfig.LARGE_BOAR.detectionRadius || 200;
+    this.attackRange = EnemyConfig.LARGE_BOAR.attackRange || 60;
     
-    // 从EnemyData获取冲锋相关属性
-    this.chargeSpeed = EnemyData.LARGE_BOAR.chargeSpeed;
-    this.chargeCooldown = EnemyData.LARGE_BOAR.chargeCooldown * 1000; // 转换为毫秒
+    // 从EnemyConfig获取冲锋相关属性
+    this.chargeSpeed = EnemyConfig.LARGE_BOAR.chargeSpeed;
+    this.chargeCooldown = EnemyConfig.LARGE_BOAR.chargeCooldown * 1000; // 转换为毫秒
     this.canCharge = true;
     this.isCharging = false;
     this.chargeDistance = 250; // 冲锋距离
     
-    // 从EnemyData获取践踏技能相关属性
-    this.stompRadius = EnemyData.LARGE_BOAR.stompRadius;
+    // 从EnemyConfig获取践踏技能相关属性
+    this.stompRadius = EnemyConfig.LARGE_BOAR.stompRadius;
     this.stompDamage = this.damage * 1.25; // 践踏伤害为基础伤害的1.25倍
-    this.stompCooldown = EnemyData.LARGE_BOAR.stompCooldown * 1000; // 转换为毫秒
+    this.stompCooldown = EnemyConfig.LARGE_BOAR.stompCooldown * 1000; // 转换为毫秒
     this.canStomp = true;
     
     // 设置物理属性
@@ -39,50 +39,50 @@ class LargeBoar extends Enemy {
     this.sprite.setScale(1.3); // 大型野猪体型更大
     
     // 设置动画
-    if (!scene.anims.exists(EnemyData.LARGE_BOAR.animations.idle)) {
+    if (!scene.anims.exists(EnemyConfig.LARGE_BOAR.animations.idle)) {
       scene.anims.create({
-        key: EnemyData.LARGE_BOAR.animations.idle,
-        frames: scene.anims.generateFrameNumbers(EnemyData.LARGE_BOAR.sprite, { start: 0, end: 1 }),
+        key: EnemyConfig.LARGE_BOAR.animations.idle,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.LARGE_BOAR.sprite, { start: 0, end: 1 }),
         frameRate: 2,
         repeat: -1
       });
       
       scene.anims.create({
-        key: EnemyData.LARGE_BOAR.animations.move,
-        frames: scene.anims.generateFrameNumbers(EnemyData.LARGE_BOAR.sprite, { start: 2, end: 5 }),
+        key: EnemyConfig.LARGE_BOAR.animations.move,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.LARGE_BOAR.sprite, { start: 2, end: 5 }),
         frameRate: 8,
         repeat: -1
       });
       
       scene.anims.create({
-        key: EnemyData.LARGE_BOAR.animations.attack,
-        frames: scene.anims.generateFrameNumbers(EnemyData.LARGE_BOAR.sprite, { start: 6, end: 8 }),
+        key: EnemyConfig.LARGE_BOAR.animations.attack,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.LARGE_BOAR.sprite, { start: 6, end: 8 }),
         frameRate: 10,
         repeat: 0
       });
       
       scene.anims.create({
         key: 'large_boar_charge',
-        frames: scene.anims.generateFrameNumbers(EnemyData.LARGE_BOAR.sprite, { start: 9, end: 11 }),
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.LARGE_BOAR.sprite, { start: 9, end: 11 }),
         frameRate: 12,
         repeat: -1
       });
       
       scene.anims.create({
-        key: EnemyData.LARGE_BOAR.animations.special,
-        frames: scene.anims.generateFrameNumbers(EnemyData.LARGE_BOAR.sprite, { start: 12, end: 15 }),
+        key: EnemyConfig.LARGE_BOAR.animations.special,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.LARGE_BOAR.sprite, { start: 12, end: 15 }),
         frameRate: 10,
         repeat: 0
       });
     }
     
     // 播放默认动画
-    this.sprite.anims.play(EnemyData.LARGE_BOAR.animations.idle, true);
+    this.sprite.anims.play(EnemyConfig.LARGE_BOAR.animations.idle, true);
     
     // 设置行为模式
-    this.behavior = EnemyData.LARGE_BOAR.behavior; // 从EnemyData获取行为模式
-    this.detectionRange = EnemyData.LARGE_BOAR.detectionRadius;
-    this.aggroRadius = EnemyData.LARGE_BOAR.aggroRadius;
+    this.behavior = EnemyConfig.LARGE_BOAR.behavior; // 从EnemyConfig获取行为模式
+    this.detectionRange = EnemyConfig.LARGE_BOAR.detectionRadius;
+    this.aggroRadius = EnemyConfig.LARGE_BOAR.aggroRadius;
   }
   
   // 重写更新方法，添加大型野猪特有的行为
@@ -91,10 +91,10 @@ class LargeBoar extends Enemy {
     
     // 更新动画
     if (this.currentState === this.states.IDLE) {
-      this.sprite.anims.play(EnemyData.LARGE_BOAR.animations.idle, true);
+      this.sprite.anims.play(EnemyConfig.LARGE_BOAR.animations.idle, true);
     } else if (this.currentState === this.states.PATROL || this.currentState === this.states.CHASE) {
       if (!this.isCharging && !this.isStomping) {
-        this.sprite.anims.play(EnemyData.LARGE_BOAR.animations.move, true);
+        this.sprite.anims.play(EnemyConfig.LARGE_BOAR.animations.move, true);
       }
     }
     
@@ -147,7 +147,7 @@ class LargeBoar extends Enemy {
     this.sprite.anims.play('large_boar_charge', true);
     
     // 播放冲锋音效
-    this.scene.sound.play(EnemyData.LARGE_BOAR.soundEffects.attack);
+    this.scene.sound.play(EnemyConfig.LARGE_BOAR.soundEffects.attack);
     
     // 设置冲锋状态
     this.isCharging = true;
@@ -174,10 +174,10 @@ class LargeBoar extends Enemy {
     this.sprite.setVelocity(0);
     
     // 播放践踏动画
-    this.sprite.anims.play(EnemyData.LARGE_BOAR.animations.special, true);
+    this.sprite.anims.play(EnemyConfig.LARGE_BOAR.animations.special, true);
     
     // 播放践踏音效
-    this.scene.sound.play(EnemyData.LARGE_BOAR.soundEffects.special);
+    this.scene.sound.play(EnemyConfig.LARGE_BOAR.soundEffects.special);
     
     // 设置践踏状态
     this.isStomping = true;
@@ -244,7 +244,7 @@ class LargeBoar extends Enemy {
     if (this.isStomping || this.isCharging) return;
     
     // 播放攻击动画
-    this.sprite.anims.play(EnemyData.LARGE_BOAR.animations.attack, true);
+    this.sprite.anims.play(EnemyConfig.LARGE_BOAR.animations.attack, true);
     
     // 如果与玩家接触，造成伤害
     const distance = Phaser.Math.Distance.Between(
@@ -270,9 +270,10 @@ class LargeBoar extends Enemy {
   takeDamage(amount) {
     const actualDamage = super.takeDamage(amount);
     
-    // 大型野猪受伤时可能会停止冲锋
+    // 大型野猪受伤时可能会停止冲锋，但不进入眩晕状态
     if (this.isCharging && Math.random() < 0.2) {
-      this.stopCharge();
+      this.isCharging = false;
+      this.sprite.setVelocity(0);
     }
     
     // 大型野猪在低生命值时更容易使用践踏技能
@@ -286,7 +287,7 @@ class LargeBoar extends Enemy {
   // 重写死亡方法
   die() {
     // 大型野猪死亡时的特殊效果
-    this.scene.sound.play(EnemyData.LARGE_BOAR.soundEffects.die);
+    this.scene.sound.play(EnemyConfig.LARGE_BOAR.soundEffects.die);
     
     // 地面震动效果
     this.scene.cameras.main.shake(500, 0.01);

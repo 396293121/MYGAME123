@@ -45,7 +45,7 @@ const ANIMATION_CONFIGS = {
       // 攻击动画配置
       attack: {
         keyFrame: {
-          frameNumber: 9        // 关键帧的具体帧数（对应实际第6帧）
+          frameNumber: 7        // 关键帧的具体帧数（对应实际第6帧）
         },
         //剑伸出剑尖X坐标：180 角色中心106
         hitbox: {

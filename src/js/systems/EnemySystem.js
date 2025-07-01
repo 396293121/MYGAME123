@@ -7,7 +7,7 @@ import MysteriousStranger from '../classes/enemies/MysteriousStranger.js';
 import BoarKing from '../classes/enemies/BoarKing.js';
 import LargeBoar from '../classes/enemies/LargeBoar.js';
 import WildBoar from '../classes/enemies/WildBoar.js';
-import EnemyData from '../data/EnemyData.js';
+import EnemyConfig from '../data/EnemyConfig.js';
 import ConfigManager from './ConfigManager.js';
 import EventBus from './EventBus.js';
 import Logger from './Logger.js';
@@ -77,42 +77,138 @@ class EnemySystem {
   }
   
   /**
-   * 初始化敌人对象池
+   * 初始化敌人对象池（优化版）
    * @public
    */
   initializeEnemyPool() {
     if (this.poolInitialized) {
       return;
     }
-    Object.entries(this.enemyTypes).forEach(([type, EnemyClass]) => {
-      this.enemyPool[type] = [];
-      this.poolStats[type] = {
-        created: 0,
-        recycled: 0,
-        inUse: 0,
-        poolSize: 0
-      };
-      
-      // 预分配对象
-      const initialSize = this.config.objectPool.initialSizes.hasOwnProperty(type) 
-        ? this.config.objectPool.initialSizes[type] 
-        : this.config.objectPool.defaultSize;
-      for (let i = 0; i < initialSize; i++) {
-        try {
-          const enemy = new EnemyClass(this.scene, -1000, -1000); // 在屏幕外创建
-          enemy.sprite.setActive(false);
-          enemy.sprite.setVisible(false);
-          enemy.sprite.body.enable = false;
-          this.enemyPool[type].push(enemy);
-          this.poolStats[type].poolSize++;
-        } catch (error) {
-          Logger.error(`Failed to pre-allocate ${type}`, error);
-        }
-      }
+    
+    // 批量初始化对象池
+    const poolPromises = Object.entries(this.enemyTypes).map(([type, EnemyClass]) => {
+      return this.initializePoolForType(type, EnemyClass);
     });
     
-    this.poolInitialized = true;
-    Logger.debug('Enemy pools initialized', this.poolStats);
+    Promise.all(poolPromises).then(() => {
+      this.poolInitialized = true;
+      Logger.info('Enemy pools initialized', {
+        totalPools: Object.keys(this.enemyPool).length,
+        totalObjects: Object.values(this.poolStats).reduce((sum, stat) => sum + stat.poolSize, 0),
+        stats: this.poolStats
+      });
+    }).catch(error => {
+      Logger.error('Failed to initialize enemy pools', error);
+    });
+  }
+  
+  /**
+   * 为特定类型初始化对象池
+   * @private
+   */
+  async initializePoolForType(type, EnemyClass) {
+    this.enemyPool[type] = [];
+    this.poolStats[type] = {
+      created: 0,
+      recycled: 0,
+      inUse: 0,
+      poolSize: 0,
+      maxSize: 0,
+      growthCount: 0
+    };
+    
+    // 预分配对象
+    const initialSize = this.config.objectPool.initialSizes.hasOwnProperty(type) 
+      ? this.config.objectPool.initialSizes[type] 
+      : this.config.objectPool.defaultSize;
+      
+    const maxSize = this.config.objectPool.maxSizes?.[type] || this.config.objectPool.maxSize || 50;
+    this.poolStats[type].maxSize = maxSize;
+    
+    for (let i = 0; i < initialSize; i++) {
+      try {
+        const enemy = await this.createPooledEnemy(type, EnemyClass);
+        if (enemy) {
+          this.enemyPool[type].push(enemy);
+          this.poolStats[type].poolSize++;
+          this.poolStats[type].created++;
+        }
+      } catch (error) {
+        Logger.error(`Failed to pre-allocate ${type} #${i}`, error);
+      }
+    }
+  }
+  
+  /**
+   * 创建池化敌人对象
+   * @private
+   */
+  async createPooledEnemy(type, EnemyClass) {
+    const enemy = new EnemyClass(this.scene, -2000, -2000); // 在屏幕外创建
+    
+    // 优化：禁用物理和渲染
+    enemy.sprite.setActive(false);
+    enemy.sprite.setVisible(false);
+    if (enemy.sprite.body) {
+      enemy.sprite.body.enable = false;
+    }
+    
+    // 标记为池化对象
+    enemy._pooled = true;
+    enemy._poolType = type;
+    enemy._poolId = `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // 添加重置方法
+    enemy.resetForPool = this.createResetMethod(enemy);
+    
+    return enemy;
+  }
+  
+  /**
+   * 创建对象重置方法
+   * @private
+   */
+  createResetMethod(enemy) {
+    return function(x, y) {
+      // 重置位置
+      this.sprite.setPosition(x, y);
+      
+      // 重置状态
+      this.currentState = this.states.IDLE;
+      this.health = this.maxHealth;
+      this.canAttack = true;
+      
+      // 重置物理属性
+      if (this.sprite.body) {
+        this.sprite.body.setVelocity(0, 0);
+        this.sprite.body.enable = true;
+      }
+      
+      // 重置显示
+      this.sprite.setActive(true);
+      this.sprite.setVisible(true);
+      this.sprite.setAlpha(1);
+      this.sprite.setTint(0xffffff);
+      
+      // 重置动画
+      if (this.sprite.anims) {
+        this.sprite.anims.stop();
+      }
+      
+      // 清理事件监听器
+      this.sprite.removeAllListeners();
+      
+      // 重置特殊状态
+      this.isCharging = false;
+      this.isStomping = false;
+      this.isEnraged = false;
+      
+      // 重置计时器
+      this.lastAttackTime = 0;
+      this.lastPatrolWait = 0;
+      
+      Logger.debug(`Reset pooled enemy: ${this._poolId}`);
+    };
   }
   
   /**
@@ -144,7 +240,181 @@ class EnemySystem {
   }
   
   /**
-   * 创建敌人
+   * 从对象池获取敌人（优化版）
+   * @param {string} type - 敌人类型
+   * @param {number} x - X坐标
+   * @param {number} y - Y坐标
+   * @returns {Enemy|null} 敌人实例
+   */
+  getEnemyFromPool(type, x, y) {
+    if (!this.poolInitialized) {
+      this.initializeEnemyPool();
+    }
+    
+    const pool = this.enemyPool[type];
+    if (!pool) {
+      Logger.warn(`No pool found for enemy type: ${type}`);
+      return null;
+    }
+    
+    let enemy = null;
+    
+    // 尝试从池中获取对象
+    if (pool.length > 0) {
+      enemy = pool.pop();
+      this.poolStats[type].poolSize--;
+      this.poolStats[type].inUse++;
+      this.performanceStats.poolHits++;
+      
+      // 重置对象状态
+      if (enemy.resetForPool) {
+        enemy.resetForPool(x, y);
+      }
+      
+      Logger.debug(`Reused enemy from pool: ${type}`, {
+        poolSize: pool.length,
+        inUse: this.poolStats[type].inUse
+      });
+    } else {
+      // 池中没有可用对象，动态创建
+      const EnemyClass = this.enemyTypes[type];
+      if (EnemyClass) {
+        try {
+          enemy = new EnemyClass(this.scene, x, y);
+          enemy._pooled = true;
+          enemy._poolType = type;
+          enemy._poolId = `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          enemy.resetForPool = this.createResetMethod(enemy);
+          
+          this.poolStats[type].created++;
+          this.poolStats[type].inUse++;
+          this.poolStats[type].growthCount++;
+          this.performanceStats.poolMisses++;
+          this.performanceStats.totalCreated++;
+          
+          Logger.debug(`Created new enemy (pool empty): ${type}`, {
+            totalCreated: this.poolStats[type].created,
+            growthCount: this.poolStats[type].growthCount
+          });
+        } catch (error) {
+          Logger.error(`Failed to create enemy ${type}:`, error);
+          return null;
+        }
+      }
+    }
+    
+    if (enemy) {
+      // 添加到活跃敌人列表
+      this.enemies.push(enemy);
+      
+      // 设置碰撞
+      this.setupEnemyCollisions(enemy);
+      
+      // 触发事件
+      EventBus.emit('enemy:spawned', { type, enemy, position: { x, y } });
+    }
+    
+    return enemy;
+  }
+  
+  /**
+   * 回收敌人到对象池（优化版）
+   * @param {Enemy} enemy - 敌人实例
+   */
+  recycleEnemyToPool(enemy) {
+    if (!enemy || !enemy._pooled || !enemy._poolType) {
+      Logger.warn('Attempted to recycle non-pooled enemy');
+      return false;
+    }
+    
+    const type = enemy._poolType;
+    const pool = this.enemyPool[type];
+    
+    if (!pool) {
+      Logger.warn(`No pool found for enemy type: ${type}`);
+      return false;
+    }
+    
+    // 检查池大小限制
+    const maxSize = this.poolStats[type].maxSize;
+    if (pool.length >= maxSize) {
+      // 池已满，直接销毁对象
+      this.destroyEnemy(enemy);
+      Logger.debug(`Pool full, destroyed enemy: ${type}`, {
+        poolSize: pool.length,
+        maxSize: maxSize
+      });
+      return true;
+    }
+    
+    try {
+      // 从活跃列表中移除
+      const index = this.enemies.indexOf(enemy);
+      if (index > -1) {
+        this.enemies.splice(index, 1);
+      }
+      
+      // 清理敌人状态
+      this.cleanupEnemyForPool(enemy);
+      
+      // 放回池中
+      pool.push(enemy);
+      this.poolStats[type].poolSize++;
+      this.poolStats[type].inUse--;
+      this.poolStats[type].recycled++;
+      this.performanceStats.totalRecycled++;
+      
+      // 触发事件
+      EventBus.emit('enemy:recycled', { type, enemy });
+      
+      Logger.debug(`Recycled enemy to pool: ${type}`, {
+        poolSize: pool.length,
+        inUse: this.poolStats[type].inUse
+      });
+      
+      return true;
+    } catch (error) {
+      Logger.error(`Failed to recycle enemy ${type}:`, error);
+      return false;
+    }
+  }
+  
+  /**
+   * 清理敌人状态以便回收
+   * @private
+   */
+  cleanupEnemyForPool(enemy) {
+    // 停止所有动画
+    if (enemy.sprite && enemy.sprite.anims) {
+      enemy.sprite.anims.stop();
+    }
+    
+    // 清理事件监听器
+    if (enemy.sprite) {
+      enemy.sprite.removeAllListeners();
+    }
+    
+    // 禁用物理体
+    if (enemy.sprite && enemy.sprite.body) {
+      enemy.sprite.body.enable = false;
+      enemy.sprite.body.setVelocity(0, 0);
+    }
+    
+    // 隐藏精灵
+    enemy.sprite.setActive(false);
+    enemy.sprite.setVisible(false);
+    enemy.sprite.setPosition(-2000, -2000);
+    
+    // 清理碰撞
+    this.cleanupEnemyCollisions(enemy);
+    
+    // 重置状态
+    enemy.currentState = enemy.states.IDLE;
+    enemy.health = enemy.maxHealth;
+  }
+  
+  /**
+   * 创建敌人（兼容旧接口）
    * @param {string} type - 敌人类型
    * @param {number} x - X坐标
    * @param {number} y - Y坐标
@@ -265,16 +535,16 @@ class EnemySystem {
     }
   }
   
-  // 根据EnemyData创建敌人
+  // 根据EnemyConfig创建敌人
   createEnemyFromData(enemyId, x, y, config = {}) {
     // 检查敌人ID是否有效
-    if (!EnemyData[enemyId]) {
-      console.error(`Enemy ID '${enemyId}' not found in EnemyData`);
+    if (!EnemyConfig[enemyId]) {
+      console.error(`Enemy ID '${enemyId}' not found in EnemyConfig`);
       return null;
     }
     
     // 获取敌人数据
-    const enemyData = EnemyData[enemyId];
+    const enemyData = EnemyConfig[enemyId];
     
     // 获取敌人类型
     const type = enemyData.id;
@@ -772,10 +1042,17 @@ class EnemySystem {
     // 检测攻击区域内的敌人
     let hitCount = 0;
     this.enemies.forEach(enemy => {
-      if (Phaser.Geom.Rectangle.ContainsPoint(
-        attackInfo.area,
-        new Phaser.Geom.Point(enemy.sprite.x, enemy.sprite.y)
-      )) {
+      // 创建敌人的物理碰撞框矩形
+      // 使用物理体的实际世界坐标，而不是精灵坐标加偏移
+      const enemyRect = new Phaser.Geom.Rectangle(
+        enemy.sprite.body ? enemy.sprite.body.x : enemy.sprite.x,
+        enemy.sprite.body ? enemy.sprite.body.y : enemy.sprite.y,
+        enemy.sprite.body ? enemy.sprite.body.width : enemy.sprite.width,
+        enemy.sprite.body ? enemy.sprite.body.height : enemy.sprite.height
+      );
+      
+      // 检查攻击区域与敌人物理体是否重叠
+      if (Phaser.Geom.Rectangle.Overlaps(attackInfo.area, enemyRect)) {
         // 对敌人造成伤害
         this.damageEnemy(enemy, attackInfo.damage);
         hitCount++;
@@ -959,11 +1236,8 @@ class EnemySystem {
   _handleWildBoarChargeBehavior(enemy) {
     // 检查野猪是否碰到了墙壁（速度变为0）
     if (enemy.sprite.body.velocity.x === 0 || enemy.sprite.body.velocity.y === 0) {
-      // 停止冲锋
+      // 停止冲锋（stopCharge方法内部已经处理了眩晕状态）
       enemy.stopCharge();
-      
-      // 野猪撞墙后短暂眩晕
-      enemy.stun(1000); // 眩晕1秒
       
       // 播放撞墙音效
     //  this.scene.sound.play('boar_charge', { volume: 0.7 });
@@ -993,17 +1267,14 @@ class EnemySystem {
   _handleLargeBoarChargeBehavior(enemy) {
     // 检查大型野猪是否碰到了墙壁
     if (enemy.sprite.body.velocity.x === 0 || enemy.sprite.body.velocity.y === 0) {
-      // 停止冲锋
+      // 停止冲锋（stopCharge方法内部已经处理了眩晕状态）
       enemy.stopCharge();
-      
-      // 大型野猪撞墙后眩晕时间更长
-      enemy.stun(1500); // 眩晕1.5秒
       
       // 播放更强力的撞墙音效
       this.scene.sound.play('boar_charge', { volume: 0.9 });
       
       // 添加更强力的撞墙视觉效果
-      const impactEffect = this.scene.add.particles(enemy.sprite.x, enemy.sprite.y, 'large_boar_sprite', {
+      const impactEffect = this.scene.add.particles(enemy.sprite.x, enemy.sprite.y, 'wild_boar_sprite', {
         speed: 150,
         scale: { start: 0.4, end: 0 },
         blendMode: 'NORMAL',
@@ -1075,6 +1346,14 @@ class EnemySystem {
     }
   }
   
+  /**
+   * 获取活跃敌人数量
+   * @returns {number} 活跃敌人数量
+   */
+  getActiveEnemyCount() {
+    return this.enemies.length;
+  }
+
   /**
    * 获取系统统计信息
    * @returns {Object} 统计信息对象

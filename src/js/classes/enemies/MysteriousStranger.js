@@ -3,111 +3,111 @@
  * 一个身着黑衣、戴着墨镜的神秘人，似乎拥有强大的力量
  */
 import Enemy from '../Enemy.js';
-import EnemyData from '../../data/EnemyData.js';
+import EnemyConfig from '../../data/EnemyConfig.js';
 
 class MysteriousStranger extends Enemy {
   constructor(scene, x, y) {
-    super(scene, x, y, EnemyData.MYSTERIOUS_STRANGER.sprite, 0);
+    super(scene, x, y, EnemyConfig.MYSTERIOUS_STRANGER.sprite, 0);
     
     // 神秘人特有属性
-    this.health = EnemyData.MYSTERIOUS_STRANGER.stats.health;
-    this.maxHealth = EnemyData.MYSTERIOUS_STRANGER.stats.health;
-    this.damage = EnemyData.MYSTERIOUS_STRANGER.stats.damage;
-    this.defense = EnemyData.MYSTERIOUS_STRANGER.stats.defense;
-    this.magicAttack = EnemyData.MYSTERIOUS_STRANGER.stats.magicAttack;
-    this.magicDefense = EnemyData.MYSTERIOUS_STRANGER.stats.magicDefense;
-    this.speed = EnemyData.MYSTERIOUS_STRANGER.stats.speed;
-    this.exp = EnemyData.MYSTERIOUS_STRANGER.stats.exp;
+    this.health = EnemyConfig.MYSTERIOUS_STRANGER.stats.health;
+    this.maxHealth = EnemyConfig.MYSTERIOUS_STRANGER.stats.health;
+    this.damage = EnemyConfig.MYSTERIOUS_STRANGER.stats.damage;
+    this.defense = EnemyConfig.MYSTERIOUS_STRANGER.stats.defense;
+    this.magicAttack = EnemyConfig.MYSTERIOUS_STRANGER.stats.magicAttack;
+    this.magicDefense = EnemyConfig.MYSTERIOUS_STRANGER.stats.magicDefense;
+    this.speed = EnemyConfig.MYSTERIOUS_STRANGER.stats.speed;
+    this.exp = EnemyConfig.MYSTERIOUS_STRANGER.stats.exp;
     
     // 职业属性
-    this.characterClass = EnemyData.MYSTERIOUS_STRANGER.class;
+    this.characterClass = EnemyConfig.MYSTERIOUS_STRANGER.class;
     this.awakened = true;
     
     // 技能相关
-    this.heavyStrikeDamage = EnemyData.MYSTERIOUS_STRANGER.heavyStrikeDamage;
-    this.heavyStrikeCooldown = EnemyData.MYSTERIOUS_STRANGER.heavyStrikeCooldown * 1000; // 转换为毫秒
+    this.heavyStrikeDamage = EnemyConfig.MYSTERIOUS_STRANGER.heavyStrikeDamage;
+    this.heavyStrikeCooldown = EnemyConfig.MYSTERIOUS_STRANGER.heavyStrikeCooldown * 1000; // 转换为毫秒
     this.canHeavyStrike = true;
     
-    this.shadowSlashDamage = EnemyData.MYSTERIOUS_STRANGER.shadowSlashDamage;
-    this.shadowSlashRange = EnemyData.MYSTERIOUS_STRANGER.shadowSlashRange;
-    this.shadowSlashCooldown = EnemyData.MYSTERIOUS_STRANGER.shadowSlashCooldown * 1000; // 转换为毫秒
+    this.shadowSlashDamage = EnemyConfig.MYSTERIOUS_STRANGER.shadowSlashDamage;
+    this.shadowSlashRange = EnemyConfig.MYSTERIOUS_STRANGER.shadowSlashRange;
+    this.shadowSlashCooldown = EnemyConfig.MYSTERIOUS_STRANGER.shadowSlashCooldown * 1000; // 转换为毫秒
     this.canShadowSlash = true;
     
-    this.battleCryRadius = EnemyData.MYSTERIOUS_STRANGER.battleCryRadius;
-    this.battleCryCooldown = EnemyData.MYSTERIOUS_STRANGER.battleCryCooldown * 1000; // 转换为毫秒
+    this.battleCryRadius = EnemyConfig.MYSTERIOUS_STRANGER.battleCryRadius;
+    this.battleCryCooldown = EnemyConfig.MYSTERIOUS_STRANGER.battleCryCooldown * 1000; // 转换为毫秒
     this.canBattleCry = true;
     
     // 阶段性行为
     this.phase = 1;
-    this.phaseThreshold = EnemyData.MYSTERIOUS_STRANGER.phaseThreshold; // 生命值阈值进入第二阶段
+    this.phaseThreshold = EnemyConfig.MYSTERIOUS_STRANGER.phaseThreshold; // 生命值阈值进入第二阶段
     this.isAwakened = false;
     
     // 抗性
-    this.resistances = EnemyData.MYSTERIOUS_STRANGER.resistances;
+    this.resistances = EnemyConfig.MYSTERIOUS_STRANGER.resistances;
     
     // 设置物理属性
     this.sprite.setBounce(0.1);
     
     // 设置动画
-    if (!scene.anims.exists(EnemyData.MYSTERIOUS_STRANGER.animations.idle)) {
+    if (!scene.anims.exists(EnemyConfig.MYSTERIOUS_STRANGER.animations.idle)) {
       scene.anims.create({
-        key: EnemyData.MYSTERIOUS_STRANGER.animations.idle,
-        frames: scene.anims.generateFrameNumbers(EnemyData.MYSTERIOUS_STRANGER.sprite, { start: 0, end: 3 }),
+        key: EnemyConfig.MYSTERIOUS_STRANGER.animations.idle,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.MYSTERIOUS_STRANGER.sprite, { start: 0, end: 3 }),
         frameRate: 6,
         repeat: -1
       });
       
       scene.anims.create({
-        key: EnemyData.MYSTERIOUS_STRANGER.animations.move,
-        frames: scene.anims.generateFrameNumbers(EnemyData.MYSTERIOUS_STRANGER.sprite, { start: 4, end: 9 }),
+        key: EnemyConfig.MYSTERIOUS_STRANGER.animations.move,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.MYSTERIOUS_STRANGER.sprite, { start: 4, end: 9 }),
         frameRate: 10,
         repeat: -1
       });
       
       scene.anims.create({
-        key: EnemyData.MYSTERIOUS_STRANGER.animations.attack,
-        frames: scene.anims.generateFrameNumbers(EnemyData.MYSTERIOUS_STRANGER.sprite, { start: 10, end: 14 }),
+        key: EnemyConfig.MYSTERIOUS_STRANGER.animations.attack,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.MYSTERIOUS_STRANGER.sprite, { start: 10, end: 14 }),
         frameRate: 12,
         repeat: 0
       });
       
       scene.anims.create({
-        key: EnemyData.MYSTERIOUS_STRANGER.animations.heavyStrike,
-        frames: scene.anims.generateFrameNumbers(EnemyData.MYSTERIOUS_STRANGER.sprite, { start: 15, end: 20 }),
+        key: EnemyConfig.MYSTERIOUS_STRANGER.animations.heavyStrike,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.MYSTERIOUS_STRANGER.sprite, { start: 15, end: 20 }),
         frameRate: 10,
         repeat: 0
       });
       
       scene.anims.create({
-        key: EnemyData.MYSTERIOUS_STRANGER.animations.shadowSlash,
-        frames: scene.anims.generateFrameNumbers(EnemyData.MYSTERIOUS_STRANGER.sprite, { start: 21, end: 26 }),
+        key: EnemyConfig.MYSTERIOUS_STRANGER.animations.shadowSlash,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.MYSTERIOUS_STRANGER.sprite, { start: 21, end: 26 }),
         frameRate: 12,
         repeat: 0
       });
       
       scene.anims.create({
-        key: EnemyData.MYSTERIOUS_STRANGER.animations.battleCry,
-        frames: scene.anims.generateFrameNumbers(EnemyData.MYSTERIOUS_STRANGER.sprite, { start: 27, end: 30 }),
+        key: EnemyConfig.MYSTERIOUS_STRANGER.animations.battleCry,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.MYSTERIOUS_STRANGER.sprite, { start: 27, end: 30 }),
         frameRate: 8,
         repeat: 0
       });
       
       scene.anims.create({
-        key: EnemyData.MYSTERIOUS_STRANGER.animations.awakening,
-        frames: scene.anims.generateFrameNumbers(EnemyData.MYSTERIOUS_STRANGER.sprite, { start: 31, end: 36 }),
+        key: EnemyConfig.MYSTERIOUS_STRANGER.animations.awakening,
+        frames: scene.anims.generateFrameNumbers(EnemyConfig.MYSTERIOUS_STRANGER.sprite, { start: 31, end: 36 }),
         frameRate: 8,
         repeat: 0
       });
     }
     
     // 播放默认动画
-    this.sprite.anims.play(EnemyData.MYSTERIOUS_STRANGER.animations.idle, true);
+    this.sprite.anims.play(EnemyConfig.MYSTERIOUS_STRANGER.animations.idle, true);
     
     // 设置行为模式
-    this.behavior = EnemyData.MYSTERIOUS_STRANGER.behavior; // 从EnemyData获取行为模式
-    this.detectionRange = EnemyData.MYSTERIOUS_STRANGER.detectionRadius;
-    this.aggroRadius = EnemyData.MYSTERIOUS_STRANGER.aggroRadius;
-    this.attackRange = EnemyData.MYSTERIOUS_STRANGER.attackRange; // 近战攻击范围
+    this.behavior = EnemyConfig.MYSTERIOUS_STRANGER.behavior; // 从EnemyConfig获取行为模式
+    this.detectionRange = EnemyConfig.MYSTERIOUS_STRANGER.detectionRadius;
+    this.aggroRadius = EnemyConfig.MYSTERIOUS_STRANGER.aggroRadius;
+    this.attackRange = EnemyConfig.MYSTERIOUS_STRANGER.attackRange; // 近战攻击范围
     
     // 剧情对话
     this.dialogues = {
@@ -118,7 +118,7 @@ class MysteriousStranger extends Enemy {
     
     // 播放Boss音乐
     if (scene.game.gameManager && !scene.game.gameManager.isBossMusicPlaying) {
-      scene.game.gameManager.playBossMusic(EnemyData.MYSTERIOUS_STRANGER.bossMusic);
+      scene.game.gameManager.playBossMusic(EnemyConfig.MYSTERIOUS_STRANGER.bossMusic);
     }
     
     // 初始对话
@@ -142,9 +142,9 @@ class MysteriousStranger extends Enemy {
     // 更新动画
     if (!this.isUsingSkill()) {
       if (this.currentState === this.states.IDLE) {
-        this.sprite.anims.play(EnemyData.MYSTERIOUS_STRANGER.animations.idle, true);
+        this.sprite.anims.play(EnemyConfig.MYSTERIOUS_STRANGER.animations.idle, true);
       } else if (this.currentState === this.states.PATROL || this.currentState === this.states.CHASE) {
-        this.sprite.anims.play(EnemyData.MYSTERIOUS_STRANGER.animations.move, true);
+        this.sprite.anims.play(EnemyConfig.MYSTERIOUS_STRANGER.animations.move, true);
       }
     }
     
@@ -203,10 +203,10 @@ class MysteriousStranger extends Enemy {
     this.isAwakening = true;
     
     // 播放觉醒动画
-    this.sprite.anims.play(EnemyData.MYSTERIOUS_STRANGER.animations.awakening, true);
+    this.sprite.anims.play(EnemyConfig.MYSTERIOUS_STRANGER.animations.awakening, true);
     
     // 播放觉醒音效
-    this.scene.sound.play(EnemyData.MYSTERIOUS_STRANGER.sounds.awakening);
+    this.scene.sound.play(EnemyConfig.MYSTERIOUS_STRANGER.sounds.awakening);
     
     // 显示觉醒对话
     this.showDialogue(this.dialogues.awakening);
@@ -262,10 +262,10 @@ class MysteriousStranger extends Enemy {
     this.isHeavyStriking = true;
     
     // 播放重击动画
-    this.sprite.anims.play(EnemyData.MYSTERIOUS_STRANGER.animations.heavyStrike, true);
+    this.sprite.anims.play(EnemyConfig.MYSTERIOUS_STRANGER.animations.heavyStrike, true);
     
     // 播放重击音效
-    this.scene.sound.play(EnemyData.MYSTERIOUS_STRANGER.sounds.heavyStrike);
+    this.scene.sound.play(EnemyConfig.MYSTERIOUS_STRANGER.sounds.heavyStrike);
     
     // 对玩家造成伤害
     this.scene.time.delayedCall(500, () => {
@@ -317,10 +317,10 @@ class MysteriousStranger extends Enemy {
     this.isShadowSlashing = true;
     
     // 播放暗影斩动画
-    this.sprite.anims.play(EnemyData.MYSTERIOUS_STRANGER.animations.shadowSlash, true);
+    this.sprite.anims.play(EnemyConfig.MYSTERIOUS_STRANGER.animations.shadowSlash, true);
     
     // 播放暗影斩音效
-    this.scene.sound.play(EnemyData.MYSTERIOUS_STRANGER.sounds.shadowSlash);
+    this.scene.sound.play(EnemyConfig.MYSTERIOUS_STRANGER.sounds.shadowSlash);
     
     // 创建暗影斩效果
     this.scene.time.delayedCall(300, () => {
@@ -384,10 +384,10 @@ class MysteriousStranger extends Enemy {
     this.isBattleCrying = true;
     
     // 播放战吼动画
-    this.sprite.anims.play(EnemyData.MYSTERIOUS_STRANGER.animations.battleCry, true);
+    this.sprite.anims.play(EnemyConfig.MYSTERIOUS_STRANGER.animations.battleCry, true);
     
     // 播放战吼音效
-    this.scene.sound.play(EnemyData.MYSTERIOUS_STRANGER.sounds.battleCry);
+    this.scene.sound.play(EnemyConfig.MYSTERIOUS_STRANGER.sounds.battleCry);
     
     // 创建战吼效果
     const cryEffect = this.scene.add.circle(
@@ -458,10 +458,10 @@ class MysteriousStranger extends Enemy {
     if (this.isUsingSkill()) return;
     
     // 播放攻击动画
-    this.sprite.anims.play(EnemyData.MYSTERIOUS_STRANGER.animations.attack, true);
+    this.sprite.anims.play(EnemyConfig.MYSTERIOUS_STRANGER.animations.attack, true);
     
     // 播放攻击音效
-    this.scene.sound.play(EnemyData.MYSTERIOUS_STRANGER.sounds.attack);
+    this.scene.sound.play(EnemyConfig.MYSTERIOUS_STRANGER.sounds.attack);
     
     // 如果与玩家接触，造成伤害
     const distance = Phaser.Math.Distance.Between(
@@ -503,7 +503,7 @@ class MysteriousStranger extends Enemy {
   // 重写死亡方法
   die() {
     // 神秘人死亡时的特殊效果
-    this.scene.sound.play(EnemyData.MYSTERIOUS_STRANGER.sounds.die);
+    this.scene.sound.play(EnemyConfig.MYSTERIOUS_STRANGER.sounds.die);
     
     // 显示胜利对话
     this.showDialogue(this.dialogues.victory);

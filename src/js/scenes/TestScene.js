@@ -9,6 +9,12 @@ import UIManager from '../systems/UIManager.js';
 import PauseMenuUI from '../ui/PauseMenuUI.js';
 import EnemySystem from '../systems/EnemySystem.js';
 import InputManager from '../systems/InputManager.js';
+import DIContainer from '../systems/DIContainer.js';
+import EventBus from '../systems/EventBus.js';
+import Logger from '../systems/Logger.js';
+// EnemyAnimationManager已整合到EnemyAnimationController中
+// import EnemyAnimationManager from '../systems/EnemyAnimationManager.js';
+import EnemyAnimationController from '../systems/EnemyAnimationController.js';
 
 class TestScene extends Phaser.Scene {
   constructor() {
@@ -17,6 +23,38 @@ class TestScene extends Phaser.Scene {
     this.enemySystem = null;
     this.uiManager = null;
     this.inputManager = null;
+    // this.enemyAnimationManager = null; // 已整合到EnemyAnimationController
+    
+    // 依赖注入容器
+    this.container = null;
+    this.eventBus = null;
+    this.logger = null;
+  }
+  
+  /**
+   * 初始化场景
+   */
+  init() {
+    // 获取依赖注入容器
+    this.container = DIContainer.getInstance();
+    this.eventBus = this.container.get('EventBus');
+    this.logger = this.container.get('Logger');
+    
+    this.logger.info('TestScene initializing...');
+    
+    // 设置事件监听
+    this.setupEventListeners();
+  }
+  
+  /**
+   * 设置事件监听
+   */
+  setupEventListeners() {
+    // 监听敌人事件
+    this.eventBus.on('enemy-charge-start', this.onEnemyChargeStart.bind(this));
+    this.eventBus.on('enemy-charge-stop', this.onEnemyChargeStop.bind(this));
+    this.eventBus.on('enemy-death', this.onEnemyDeath.bind(this));
+    this.eventBus.on('enemy-state-change', this.onEnemyStateChange.bind(this));
   }
 
   preload() {
@@ -34,10 +72,8 @@ class TestScene extends Phaser.Scene {
     // 加载新的统一战士精灵图（213x144尺寸）
     this.load.atlas('warrior_sprite2', 'assets/images/characters/warrior/sprite/warrior_sprite2.png', 'assets/images/characters/warrior/sprite/warrior_sprite2.json');
     // 加载敌人精灵图
-    this.load.spritesheet('wild_boar_sprite', 'assets/images/enemies/wild_boar_spritesheet.png', {
-      frameWidth: 64,
-      frameHeight: 64
-    });
+    // 加载敌人精灵图 - 野猪JSON格式精灵图
+    this.load.multiatlas('wild_boar_sprite', 'assets/images/enemies/wild_boar/wild_boar_sprite.json', 'assets/images/enemies/wild_boar');
     
     // 加载音效
     this.load.audio('game_music', 'assets/audio/game_music.wav');
@@ -49,6 +85,12 @@ class TestScene extends Phaser.Scene {
     this.load.audio('warrior_sword_swing', 'assets/audio/sword_swing.wav');       // 挥剑音效
     this.load.audio('warrior_sword_hit', 'assets/audio/sword_hit.wav');           // 命中音效
     this.load.audio('warrior_jump', 'assets/audio/jump_sound.mp3');               // 跳跃音效（复用现有）
+    
+    // 加载野猪专用音效
+    this.load.audio('wild_boar_attack', 'assets/audio/wild_boar_attack.wav');     // 野猪攻击音效
+    this.load.audio('wild_boar_charge', 'assets/audio/wild_boar_charge.wav');     // 野猪冲锋音效
+    this.load.audio('wild_boar_hurt', 'assets/audio/wild_boar_hurt.wav');         // 野猪受伤音效
+    this.load.audio('wild_boar_die', 'assets/audio/wild_boar_die.wav');           // 野猪死亡音效
     // 加载UI按钮纹理
 this.load.image('continue_button', 'assets/images/ui/buttons/continue_2.png');
 this.load.image('save_button', 'assets/images/ui/buttons/save_2.png');
@@ -71,6 +113,11 @@ this.load.spritesheet('items', 'assets/images/items/items_spritesheet.png', {
     // 初始化音频
     this.initializeAudio();
     
+    // 初始化敌人动画管理器
+    // this.enemyAnimationManager = new EnemyAnimationManager(this); // 已整合到EnemyAnimationController
+    // 预加载常用敌人动画
+    EnemyAnimationController.preloadAnimations(this, ['wild_boar', 'large_boar']);
+    
     // 创建地图
     this.createMap();
     
@@ -91,6 +138,9 @@ this.load.spritesheet('items', 'assets/images/items/items_spritesheet.png', {
     
     // 创建控制键
     this.createControls();
+    
+    // 创建调试UI
+    this.createDebugUI();
     
     // 设置相机跟随玩家
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
@@ -422,6 +472,8 @@ this.load.spritesheet('items', 'assets/images/items/items_spritesheet.png', {
     // 处理所有敌人的特殊行为
     this.enemySystem.handleSpecialBehaviors();
     
+
+    
     // 更新HUD UI
     const gameHudUI = this.uiManager.getUI('gameHudUI');
     if (gameHudUI) {
@@ -430,7 +482,12 @@ this.load.spritesheet('items', 'assets/images/items/items_spritesheet.png', {
         gameState: this.game.gameManager.gameState
       });
     }
+    
+    // 更新调试信息
+    this.updateDebugInfo();
   }
+  
+
 
   // 技能功能已移除
 
@@ -459,6 +516,98 @@ this.load.spritesheet('items', 'assets/images/items/items_spritesheet.png', {
     
     // 输出当前场景中的音频数量
     console.log(`Total sounds in scene: ${this.sound.sounds.length}`);
+  }
+  
+
+  
+  /**
+   * 创建调试UI
+   */
+  createDebugUI() {
+    // 创建调试信息文本
+    this.debugText = this.add.text(10, 10, '', {
+      fontSize: '14px',
+      fill: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 5, y: 5 }
+    }).setScrollFactor(0).setDepth(1000);
+  }
+  
+
+  
+
+  
+  /**
+   * 敌人冲锋开始事件处理
+   */
+  onEnemyChargeStart(data) {
+    this.logger.info(`Enemy ${data.type} started charging at target`);
+    
+    // 可以添加视觉效果，如屏幕震动
+    this.cameras.main.shake(100, 0.01);
+  }
+  
+  /**
+   * 敌人冲锋停止事件处理
+   */
+  onEnemyChargeStop(data) {
+    this.logger.info(`Enemy ${data.type} stopped charging`);
+  }
+  
+  /**
+   * 敌人死亡事件处理
+   */
+  onEnemyDeath(data) {
+    this.logger.info(`Enemy ${data.type} died at (${data.position.x}, ${data.position.y})`);
+    
+    // 更新任务进度
+    if (this.game.gameManager && data.type === 'wild_boar') {
+      const currentQuest = this.game.gameManager.gameState.currentQuest;
+      if (currentQuest && currentQuest.objectives[0]) {
+        currentQuest.objectives[0].current = Math.min(
+          currentQuest.objectives[0].current + 1,
+          currentQuest.objectives[0].target
+        );
+      }
+    }
+  }
+  
+  /**
+   * 敌人状态变化事件处理
+   */
+  onEnemyStateChange(data) {
+    this.logger.debug(`Enemy state changed: ${data.oldState} -> ${data.newState}`);
+  }
+  
+  /**
+   * 更新调试信息
+   */
+  updateDebugInfo() {
+    if (!this.debugText) return;
+    
+    const debugInfo = [
+      `Player Health: ${this.player ? this.player.health : 'N/A'}`,
+      `Active Enemies: ${this.enemySystem ? this.enemySystem.getActiveEnemyCount() : 0}`
+    ];
+    
+    this.debugText.setText(debugInfo.join('\n'));
+  }
+  
+  /**
+   * 场景销毁时的清理
+   */
+  destroy() {
+    // 清理事件监听
+    if (this.eventBus) {
+      this.eventBus.off('enemy-charge-start', this.onEnemyChargeStart);
+      this.eventBus.off('enemy-charge-stop', this.onEnemyChargeStop);
+      this.eventBus.off('enemy-death', this.onEnemyDeath);
+      this.eventBus.off('enemy-state-change', this.onEnemyStateChange);
+    }
+    
+    this.logger.info('TestScene destroyed');
+    
+    super.destroy();
   }
 }
 

@@ -36,7 +36,7 @@ class Character {
       physicalDefense: 5,   // 物理防御力
       magicDefense: 5,      // 魔法防御力
       speed: 100,           // 移动速度
-      jumpForce: 800        // 跳跃力
+      jumpForce: 500        // 跳跃力
     };
     
     // 技能和升级
@@ -113,7 +113,6 @@ class Character {
       if (this.state !== 'attack') {
         this.sprite.flipX = true;
       }else{
-        console.log(11111)
       }
       
       // 如果角色在地面上且不在攻击状态，播放移动动画
@@ -222,10 +221,8 @@ class Character {
     // 基础攻击逻辑，子类可以重写
     console.log(`${this.constructor.name} performs a basic attack`);
     
-    // 播放挥剑音效（攻击开始时）
-    this.audioManager.playDelayedSound(this.characterType, 'attack', 'swing');
-    
     // 播放攻击动画，并设置关键帧回调
+    // 注意：挥剑音效现在由EnhancedAnimationManager的triggerFrameBasedAudio方法基于帧数触发
     this.playAnimation('attack', (frameIndex, totalFrames) => {
       this.executeAttackHit();
       // 攻击动画结束后重置状态
@@ -316,6 +313,11 @@ class Character {
     
     this.health -= actualDamage;
     
+    // 播放受伤音效
+    if (this.audioManager) {
+      this.audioManager.playCharacterSound(this.characterType, 'damage', 'hurt');
+    }
+    
     // 显示伤害数字
     if (this.scene) {
       const damageText = this.scene.add.text(this.sprite.x, this.sprite.y - 20, Math.floor(actualDamage).toString(), {
@@ -392,8 +394,11 @@ class Character {
     // 播放死亡动画和音效
     this.playAnimation('die');
     
-    // 播放死亡音效
-    if (this.scene && this.scene.sound) {
+    // 使用音频管理器播放死亡音效
+    if (this.audioManager) {
+      this.audioManager.playCharacterSound(this.characterType, 'damage', 'die');
+    } else if (this.scene && this.scene.sound) {
+      // 备用方案：直接使用scene.sound
       this.scene.sound.play(`${this.characterType}_die`, { volume: 0.7 });
     }
     
