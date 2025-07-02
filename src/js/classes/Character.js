@@ -47,11 +47,18 @@ class Character {
     this.canAttack = true;
     this.attackCooldown = 500; // 攻击冷却时间（毫秒）
     
+    // 技能冷却管理
+    this.skillCooldowns = {};
+    
     // 设置物理属性
     this.sprite.setCollideWorldBounds(true);
     
     // 动画状态
     this.state = 'idle';
+    
+    // 技能状态管理
+    this.isUsingSkill = false;
+    this.currentSkill = null;
     
     // 保存原始纹理键，用于特殊动画完成后恢复
     this.originalTextureKey = texture;
@@ -81,7 +88,7 @@ class Character {
   // 更新角色状态
   update(cursors) {
     if (!cursors) return;
-    
+    console.log(9999)
     // 处理移动
     this.handleMovement(cursors);
     
@@ -97,13 +104,22 @@ class Character {
    * 在游戏循环中调用，根据垂直速度自动切换跳跃动画
    */
   updateJumpAnimationState() {
-    if (this.animationManager && !this.sprite.body.onFloor()) {
+    if (this.animationManager && !this.sprite.body.onFloor()&&this.state!='attack'&&this.state!='hurt'&&this.state!='die'&&this.isUsingSkill==false) {
       this.animationManager.updateJumpAnimationState(this.sprite, this.characterType);
     }
   }
   
   // 处理角色移动
   handleMovement(cursors) {
+    // 如果正在使用技能，不处理移动输入，但仍需要处理停止逻辑
+    if (this.isUsingSkill) {
+      // 如果没有按键输入且角色在地面上，停止水平移动
+      if (!cursors.left.isDown && !cursors.right.isDown && this.sprite.body.onFloor()) {
+        this.sprite.setVelocityX(0);
+      }
+      return;
+    }
+    
     // 基于敏捷属性计算实际移动速度
     const moveSpeed = this.stats.speed;
     
@@ -112,7 +128,6 @@ class Character {
       // 只有在非攻击状态下才改变方向
       if (this.state !== 'attack') {
         this.sprite.flipX = true;
-      }else{
       }
       
       // 如果角色在地面上且不在攻击状态，播放移动动画
@@ -138,7 +153,6 @@ class Character {
         this.playAnimation('idle');
       }
     }
-
   }
   
   // 处理角色跳跃
@@ -211,7 +225,7 @@ class Character {
   }
   
   // 基础攻击方法
-  attack() {
+  attack(attackType = 'single', customRange = null) {
     // 如果在冷却中，不能攻击
     if (!this.canAttack) return null;
     
@@ -224,7 +238,7 @@ class Character {
     // 播放攻击动画，并设置关键帧回调
     // 注意：挥剑音效现在由EnhancedAnimationManager的triggerFrameBasedAudio方法基于帧数触发
     this.playAnimation('attack', (frameIndex, totalFrames) => {
-      this.executeAttackHit();
+      this.executeAttackHit(attackType, customRange);
       // 攻击动画结束后重置状态
       if (frameIndex === totalFrames - 1) {
         this.state = 'idle';
@@ -237,41 +251,53 @@ class Character {
     // 返回攻击启动信息（不包含具体攻击数据）
     return {
       initiated: true,
-      attacker: this
+      attacker: this,
+      attackType: attackType
     };
   }
   
   /**
    * 执行攻击命中判定（在关键帧触发）
-   * 实时计算攻击方向
+   * 实时计算攻击方向，支持单体和群体攻击类型
    */
-  executeAttackHit() {
+  executeAttackHit(attackType = 'single', customRange = null, damageMultiplier = 1.0) {
     // 从配置文件中读取攻击范围参数
     const config = ANIMATION_CONFIGS[this.characterType];
     const enhancedConfig = config?.enhancedAnimation?.attack;
     
     // 如果没有增强配置，使用默认值
-    const attackWidth = enhancedConfig?.hitbox?.width || 74;
-    const attackHeight = enhancedConfig?.hitbox?.height || 100;
-    const offsetX = enhancedConfig?.hitbox?.offsetX || 0;
-    const offsetY = enhancedConfig?.hitbox?.offsetY || -15;
+    let attackWidth = enhancedConfig?.hitbox?.width || 74;
+    let attackHeight = enhancedConfig?.hitbox?.height || 100;
+    let offsetX = enhancedConfig?.hitbox?.offsetX || 0;
+    let offsetY = enhancedConfig?.hitbox?.offsetY || -15;
+    
+    // 如果提供了自定义范围，使用自定义范围
+    if (customRange) {
+      attackWidth = customRange.width || attackWidth;
+      attackHeight = customRange.height || attackHeight;
+      offsetX = customRange.offsetX || offsetX;
+      offsetY = customRange.offsetY || offsetY;
+    }
     
     // 实时计算攻击方向
     const direction = this.sprite.flipX ? -1 : 1;
-
+    
+    // 统一使用配置文件中的offsetX和offsetY来决定攻击区域
     const attackArea = new Phaser.Geom.Rectangle(
-      this.sprite.x + (direction > 0 ? offsetX : -attackWidth), // 向左攻击时，从角色位置减去攻击宽度
-      this.sprite.y - attackHeight + offsetY, // 调整Y坐标，使攻击框更好地对齐角色中心
-      attackWidth, // 攻击宽度
+      this.sprite.x + (direction > 0 ? offsetX : -attackWidth), // 根据方向和配置的offsetX调整位置
+      this.sprite.y - attackHeight + offsetY, // 使用配置的offsetY调整Y坐标
+      attackWidth,
       attackHeight
     );
+    
     // 通过全局事件总线发布攻击命中事件
     if (window.eventBus) {
       window.eventBus.emit('playerAttackHit', {
         attacker: this,
-        damage: this.stats.physicalAttack,
+        damage: this.stats.physicalAttack * damageMultiplier,
         area: attackArea,
         direction: direction,
+        attackType: attackType,
         timestamp: Date.now()
       });
     }
@@ -279,7 +305,9 @@ class Character {
     // 可选：显示攻击范围调试信息
     if (this.scene.physics && this.scene.physics.world.drawDebug) {
       const graphics = this.scene.add.graphics();
-      graphics.lineStyle(2, 0xff0000);
+      // 根据攻击类型使用不同颜色
+      const debugColor = attackType === 'aoe' ? 0x00ff00 : 0xff0000;
+      graphics.lineStyle(2, debugColor);
       graphics.strokeRectShape(attackArea);
       
       // 短暂显示后销毁
@@ -289,12 +317,22 @@ class Character {
     }
   }
   
-  // 开始攻击冷却
+  // 设置攻击冷却
   startAttackCooldown() {
     this.canAttack = false;
     this.scene.time.delayedCall(this.attackCooldown, () => {
       this.canAttack = true;
     });
+  }
+  
+  // 执行单体攻击
+  performAttack(damageMultiplier = 1.0) {
+    this.executeAttackHit('single', null, damageMultiplier);
+  }
+  
+  // 执行范围攻击
+  performAreaAttack(damageMultiplier = 1.0, attackArea = null) {
+    this.executeAttackHit('aoe', attackArea, damageMultiplier);
   }
   
   // 受伤方法
@@ -423,31 +461,36 @@ class Character {
   
   // 使用技能
   useSkill(skillId) {
-    // 检查技能是否已解锁
-    if (!this.unlockedSkills.includes(skillId)) {
-      console.log(`Skill ${skillId} not unlocked`);
+    // 检查技能冷却
+    if (this.skillCooldowns[skillId] && this.skillCooldowns[skillId] > Date.now()) {
+      console.log(`Skill ${skillId} is on cooldown`);
       return false;
     }
     
-    // 获取技能信息
-    const skill = Skills[skillId];
+    // 获取技能配置
+    const skill = this.classSkills[skillId.toUpperCase()];
     if (!skill) {
-      console.log(`Skill ${skillId} not found`);
+      console.log(`Skill ${skillId} not found in class skills`);
       return false;
     }
     
-    // 检查魔法值是否足够
-    if (this.mana < skill.manaCost) {
+    // 检查魔法值是否足够（如果技能需要魔法值）
+    if (skill.manaCost && this.mana < skill.manaCost) {
       console.log('Not enough mana');
       return false;
     }
     
     // 使用魔法值
-    this.mana -= skill.manaCost;
+    if (skill.manaCost) {
+      this.mana -= skill.manaCost;
+    }
     
-    // 执行技能效果（这里只是一个占位符，实际效果应该在子类中实现）
+    // 设置技能冷却
+    if (skill.cooldown) {
+      this.skillCooldowns[skillId] = Date.now() + skill.cooldown;
+    }
+    
     console.log(`Using skill: ${skill.name}`);
-    
     return true;
   }
   /**
@@ -480,6 +523,13 @@ class Character {
    * @param {Function} onKeyFrame - 关键帧回调（用于攻击判定）
    */
   playAnimation(animationKey, onKeyFrame = null) {
+    // 检查是否为技能动画
+    const skillAnimations = ['heavy_slash', 'whirlwind', 'battle_cry'];
+    if (skillAnimations.includes(animationKey)) {
+      this.isUsingSkill = true;
+      this.currentSkill = animationKey;
+    }
+    
     // 使用增强动画管理器播放动画
     const success = this.animationManager.playEnhancedAnimation(
       this.sprite,
@@ -500,7 +550,25 @@ class Character {
    * @param {string} animationKey - 完成的动画键名
    */
   onAnimationComplete(animationKey) {
-    // 根据角色当前状态恢复相应动画
+    // 检查是否为技能动画，如果是则重置技能状态
+    const skillAnimations = ['heavy_slash', 'whirlwind', 'battle_cry'];
+    
+    if (skillAnimations.includes(animationKey)) {
+      // 重置技能状态
+      this.isUsingSkill = false;
+      this.currentSkill = null;
+      
+      // 技能只能在地面使用，所以动画完成后检查移动状态
+      if (Math.abs(this.sprite.body.velocity.x) > 0) {
+        this.playAnimation('move');
+      } else {
+        this.playAnimation('idle');
+      }
+      return;
+    }
+    
+    
+    // 对于非技能动画，保持原有逻辑
     if (this.sprite.body.onFloor()) {
       // 检查是否还在移动
       if (Math.abs(this.sprite.body.velocity.x) > 0) {

@@ -3,19 +3,22 @@
  * 高魔攻较高魔法低物防中速，使用远程攻击，武器类型为法杖
  */
 import Character from './Character.js';
+import { getCharacterConfig } from '../data/CharacterConfig.js';
 
 class Mage extends Character {
   constructor(scene, x, y) {
     // 使用法师的默认纹理
     super(scene, x, y, 'mage', 0);
     
-    // 法师特有属性调整
-    this.attributes = {
-      strength: 3,      // 法师力量较低
-      agility: 5,       // 法师敏捷中等
-      vitality: 4,      // 法师体力较低
-      intelligence: 9   // 法师智力高
-    };
+    // 从配置文件获取法师配置
+    const config = getCharacterConfig('mage');
+    if (!config) {
+      console.error('Mage config not found, using default values');
+      return;
+    }
+    
+    // 使用配置文件中的属性
+    this.attributes = { ...config.attributes };
     
     // 更新衍生属性
     this.updateStats();

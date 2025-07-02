@@ -3,54 +3,41 @@
  * 高攻高物防但低速较低魔防，使用近战攻击，武器类型为剑
  */
 import Character from './Character.js';
+import { getCharacterConfig } from '../data/CharacterConfig.js';
+import ANIMATION_CONFIGS from '../data/AnimationConfig.js';
 
 class Warrior extends Character {
   constructor(scene, x, y) {
     // 使用战士的默认纹理
     super(scene, x, y, 'warrior', 0);
     
-    // 战士特有属性调整
-    this.attributes = {
-      strength: 8,      // 战士起始力量更高
-      agility: 4,       // 战士敏捷较低
-      vitality: 7,      // 战士体力较高
-      intelligence: 3   // 战士智力较低
-    };
+    // 从配置文件获取战士配置
+    const config = getCharacterConfig('warrior');
+    if (!config) {
+      console.error('Warrior config not found, using default values');
+      return;
+    }
+    
+    // 使用配置文件中的属性
+    this.attributes = { ...config.attributes };
     
     // 更新衍生属性
     this.updateStats();
     
-    // 战士特有的属性
-    this.weaponType = 'sword';
-    this.attackRange = 'melee'; // 近战攻击
+    // 使用配置文件中的职业特性
+    this.weaponType = config.weaponType;
+    this.attackRange = config.attackRange;
     
-    // 战士特有技能
-    this.classSkills = {
-      HEAVY_SLASH: {
-        id: 'heavy_slash',
-        name: "重斩",
-        description: "对目标造成150%物理伤害",
-        manaCost: 10,
-        cooldown: 3000, // 3秒冷却
-        unlockLevel: 3
-      },
-      SHIELD_BASH: {
-        id: 'shield_bash',
-        name: "盾击",
-        description: "对目标造成伤害并眩晕1秒",
-        manaCost: 15,
-        cooldown: 5000, // 5秒冷却
-        unlockLevel: 5
-      },
-      BATTLE_CRY: {
-        id: 'battle_cry',
-        name: "战吼",
-        description: "提高自身20%攻击力，持续10秒",
-        manaCost: 25,
-        cooldown: 15000, // 15秒冷却
-        unlockLevel: 7
-      }
-    };
+    // 使用配置文件中的技能
+    this.classSkills = { ...config.classSkills };
+    
+    // 初始化技能冷却状态
+    this.skillCooldowns = {};
+    Object.keys(this.classSkills).forEach(skillKey => {
+      this.skillCooldowns[skillKey] = 0;
+    });
+    
+    console.log('Warrior created with enhanced combat abilities');
   }
   
   // 重写更新衍生属性方法，强化战士的物理攻击和防御
@@ -72,11 +59,13 @@ class Warrior extends Character {
   attack() {
     console.log('Warrior performs a sword slash!');
     
-    // 调用父类的攻击方法获取基本攻击信息
-    const attackInfo = super.attack();
+    // 调用父类的攻击方法，指定为单体攻击
+    const attackInfo = super.attack('single');
     
     // 战士的攻击伤害略高
-    attackInfo.damage = this.stats.physicalAttack * 1.1;
+    if (attackInfo) {
+      attackInfo.damage = this.stats.physicalAttack * 1.1;
+    }
     
     // 这里可以添加战士特有的攻击动画和效果
     // 例如，创建一个剑光效果
@@ -103,56 +92,142 @@ class Warrior extends Character {
   // 设置攻击冷却
   startAttackCooldown() {
     this.canAttack = false;
-    this.scene.time.delayedCall(500, () => {
+    // 使用配置文件中的攻击冷却时间，默认500ms
+    const cooldownTime = this.attackCooldown || 500;
+    this.scene.time.delayedCall(cooldownTime, () => {
       this.canAttack = true;
     });
   }
   
   // 战士特有技能 - 重斩
   heavySlash() {
-    if (this.useSkill('heavy_slash')) {
-      console.log('Warrior performs Heavy Slash!');
-      // 造成150%的物理伤害
-      return this.stats.physicalAttack * 1.5;
+    // 检查是否在地面上
+    if (!this.sprite.body.onFloor()) {
+      console.log('Cannot use Heavy Slash in the air');
+      return false;
     }
-    return 0;
+    
+    if (!this.useSkill('heavy_slash')) {
+      return false;
+    }
+    
+    console.log('Warrior performs Heavy Slash!');
+    
+    // 从配置文件获取关键帧信息
+    const keyFrameNumber = ANIMATION_CONFIGS?.warrior?.enhancedAnimation?.heavy_slash?.keyFrame?.frameNumber || 
+                          Math.floor(30 * 0.5); // 默认值：30帧的50%
+    
+    // 播放重斩动画
+    this.playAnimation('heavy_slash', (frameIndex, totalFrames) => {
+      // 在配置的关键帧处触发攻击判定
+      if (frameIndex >= keyFrameNumber) {
+        this.performAttack(this.classSkills.HEAVY_SLASH.damage);
+      }
+    });
+    
+    return true;
   }
   
-  // 战士特有技能 - 盾击
-  shieldBash() {
-    if (this.useSkill('shield_bash')) {
-      console.log('Warrior performs Shield Bash!');
-      // 返回伤害值和眩晕效果
-      return {
-        damage: this.stats.physicalAttack * 0.8,
-        effect: {
-          type: 'stun',
-          duration: 1000 // 1秒眩晕
-        }
-      };
+  // 战士特有技能 - 旋风斩
+  whirlwind() {
+    // 检查是否在地面上
+    if (!this.sprite.body.onFloor()) {
+      console.log('Cannot use Whirlwind in the air');
+      return false;
     }
-    return 0;
+    
+    if (!this.useSkill('whirlwind')) {
+      return false;
+    }
+    
+    console.log('Warrior performs Whirlwind!');
+    
+    // 从配置文件获取关键帧信息
+    const keyFrameNumber = ANIMATION_CONFIGS?.warrior?.enhancedAnimation?.whirlwind?.keyFrame?.frameNumber || 
+                          Math.floor(28 * 0.5); // 默认值：28帧的50%
+    
+    // 播放旋风斩动画
+    this.playAnimation('whirlwind', (frameIndex, totalFrames) => {
+      // 在配置的关键帧处触发攻击判定
+      if (frameIndex >= keyFrameNumber) {
+        // 获取旋风斩攻击范围
+        const whirlwindRange = this.classSkills.WHIRLWIND.attackArea;
+        this.performAreaAttack(this.classSkills.WHIRLWIND.damage, whirlwindRange);
+      }
+    });
+    
+    return true;
   }
   
   // 战士特有技能 - 战吼
   battleCry() {
-    if (this.useSkill('battle_cry')) {
-      console.log('Warrior performs Battle Cry!');
-      
-      // 提高攻击力
-      const originalAttack = this.stats.physicalAttack;
-      this.stats.physicalAttack *= 1.2;
-      
-      // 10秒后恢复
-      setTimeout(() => {
-        this.stats.physicalAttack = originalAttack;
-        console.log('Battle Cry effect ended');
-      }, 10000);
-      
-      return true;
+    // 检查是否在地面上
+    if (!this.sprite.body.onFloor()) {
+      console.log('Cannot use Battle Cry in the air');
+      return false;
     }
-    return false;
+    
+    if (!this.useSkill('battle_cry')) {
+      return false;
+    }
+    
+    console.log('Warrior performs Battle Cry!');
+    
+    // 从配置文件获取关键帧信息
+    const keyFrameNumber = ANIMATION_CONFIGS?.warrior?.enhancedAnimation?.battle_cry?.keyFrame?.frameNumber || 
+                          Math.floor(27 * 0.5); // 默认值：27帧的50%
+    
+    // 播放战吼动画
+    this.playAnimation('battle_cry', (frameIndex, totalFrames) => {
+      // 在配置的关键帧处触发效果
+      if (frameIndex >= keyFrameNumber) {
+        this.applyBattleCryEffect();
+      }
+    });
+    
+    return true;
   }
+
+    /**
+     * 应用战吼效果
+     */
+    applyBattleCryEffect() {
+        // 从配置文件获取战吼效果参数
+        const battleCryConfig = this.classSkills.BATTLE_CRY;
+        const buffMultiplier = battleCryConfig.buffMultiplier || 1.2;
+        const duration = battleCryConfig.duration || 10000;
+        
+        // 提高攻击力
+        const originalAttack = this.stats.physicalAttack;
+        this.stats.physicalAttack *= buffMultiplier;
+        
+        console.log(`Battle Cry effect applied! Attack increased by ${(buffMultiplier - 1) * 100}%`);
+        
+        // 持续时间后恢复
+        setTimeout(() => {
+            this.stats.physicalAttack = originalAttack;
+            console.log('Battle Cry effect ended');
+        }, duration);
+        
+        // 震慑周围敌人（可选效果）
+        const stunRange = battleCryConfig.stunRange || { width: 200, height: 100, offsetX: -100, offsetY: -50 };
+        const stunDuration = battleCryConfig.stunDuration || 2000;
+        
+        const battleCryRange = {
+            x: this.sprite.x + stunRange.offsetX,
+            y: this.sprite.y + stunRange.offsetY,
+            width: stunRange.width,
+            height: stunRange.height
+        };
+        
+        // 发送战吼事件给敌人系统
+        window.eventBus.emit('playerBattleCry', {
+            attacker: this,
+            area: battleCryRange,
+            effect: 'stun',
+            duration: stunDuration
+        });
+    }
 }
 
 export default Warrior;

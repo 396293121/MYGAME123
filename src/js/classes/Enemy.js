@@ -43,6 +43,11 @@ class Enemy {
     this.canAttack = true;
     this.attackCooldown = this.timingConfig.BASE_ATTACK_COOLDOWN;
     
+    // 卡住检测相关属性
+    this.lastPosition = null;
+    this.lastPositionUpdateTime = 0;
+    this.stuckAccumulatedTime = 0;
+    
     // 物理属性设置
     this.sprite.setCollideWorldBounds(true);
     this.sprite.setBounce(this.physicsConfig.BOUNCE);
@@ -167,6 +172,130 @@ class Enemy {
       
       // 设置朝向
       this.sprite.flipX = this.sprite.body.velocity.x < 0;
+    }
+    
+    // 卡住检测逻辑
+    const stuckConfig = EnemyConfigManager.getStuckDetectionConfig();
+    
+    if (!this.lastPosition) {
+      this.lastPosition = { x: this.sprite.x, y: this.sprite.y };
+      this.lastPositionUpdateTime = time;
+      this.stuckAccumulatedTime = 0;
+    } else {
+      // 检查是否到了位置更新间隔
+      if (time - this.lastPositionUpdateTime > stuckConfig.CHECK_INTERVAL) {
+        // 计算在这个间隔内的移动距离
+        const moveDistance = Phaser.Math.Distance.Between(
+          this.lastPosition.x, this.lastPosition.y,
+          this.sprite.x, this.sprite.y
+        );
+        
+        console.log(`Movement check: distance=${moveDistance}, threshold=${stuckConfig.MIN_MOVEMENT_DISTANCE}`);
+        
+        // 检查是否移动距离太小（可能卡住）
+        if (moveDistance < stuckConfig.MIN_MOVEMENT_DISTANCE) {
+          // 增加卡住计数时间
+          this.stuckAccumulatedTime += (time - this.lastPositionUpdateTime);
+          console.log(`Potential stuck detected, accumulated time: ${this.stuckAccumulatedTime}`);
+          
+          // 检查是否达到卡住阈值
+          if (this.stuckAccumulatedTime >= stuckConfig.STUCK_TIME_THRESHOLD) {
+            console.log(`Enemy stuck confirmed! Total stuck time: ${this.stuckAccumulatedTime}, handling...`);
+            
+            // 处理卡住情况
+            if (this.patrolPoints.length > 1) {
+              // 移除当前无法到达的巡逻点
+              console.log(`Removing unreachable patrol point at index ${this.currentPatrolIndex}`);
+              this.patrolPoints.splice(this.currentPatrolIndex, 1);
+              
+              // 调整当前巡逻索引
+              if (this.currentPatrolIndex >= this.patrolPoints.length) {
+                this.currentPatrolIndex = 0;
+              }
+              
+              console.log(`Remaining patrol points: ${this.patrolPoints.length}`);
+            } else if (this.patrolPoints.length === 1) {
+              // 如果只剩一个巡逻点，根据当前朝向设置相反方向的巡逻点
+              console.log('Only one patrol point left, creating patrol point in opposite direction');
+              
+              // 获取当前速度方向，如果没有速度则使用默认方向
+              let directionX = this.sprite.body.velocity.x;
+              
+              // 如果当前没有移动，使用sprite的朝向或默认向左
+              if (Math.abs(directionX) < 5) {
+                // 检查sprite是否有flipX属性来判断朝向
+                if (this.sprite.flipX !== undefined) {
+                  directionX = this.sprite.flipX ? -1 : 1;
+                } else {
+                  directionX = -1; // 默认向左
+                }
+              }
+              
+              // 设置相反方向的巡逻点，距离为80-120像素
+              const oppositeDirection = directionX > 0 ? -1 : 1;
+              const patrolDistance = 80 + Math.random() * 40; // 80-120像素
+              
+              this.patrolPoints[0] = {
+                x: this.sprite.x + oppositeDirection * patrolDistance,
+                y: this.sprite.y // 保持Y轴不变，避免垂直移动
+              };
+              
+              console.log(`New patrol point set in opposite direction: (${this.patrolPoints[0].x}, ${this.patrolPoints[0].y}), direction: ${oppositeDirection > 0 ? 'right' : 'left'}`);
+            }
+            
+            // 检查是否所有巡逻点都被移除
+            if (this.patrolPoints.length === 0) {
+              console.log('All patrol points removed, triggering patrol setup...');
+              
+              // 尝试调用setupPatrolPoints方法重新生成巡逻点
+              if (typeof this.setupPatrolPoints === 'function') {
+                console.log('Calling setupPatrolPoints to regenerate patrol points');
+                this.setupPatrolPoints(this.sprite.x, this.sprite.y);
+              } else {
+                // 如果没有setupPatrolPoints方法，根据当前朝向设置相反方向的巡逻点
+                console.log('No setupPatrolPoints method, creating patrol point in opposite direction');
+                
+                // 获取当前速度方向，如果没有速度则使用默认方向
+                let directionX = this.sprite.body.velocity.x;
+                
+                // 如果当前没有移动，使用sprite的朝向或默认向左
+                if (Math.abs(directionX) < 5) {
+                  // 检查sprite是否有flipX属性来判断朝向
+                  if (this.sprite.flipX !== undefined) {
+                    directionX = this.sprite.flipX ? -1 : 1;
+                  } else {
+                    directionX = -1; // 默认向左
+                  }
+                }
+                
+                // 设置相反方向的巡逻点，距离为80-120像素
+                const oppositeDirection = directionX > 0 ? -1 : 1;
+                const patrolDistance = 80 + Math.random() * 40; // 80-120像素
+                
+                this.patrolPoints = [{
+                  x: this.sprite.x + oppositeDirection * patrolDistance,
+                  y: this.sprite.y // 保持Y轴不变，避免垂直移动
+                }];
+                this.currentPatrolIndex = 0;
+                
+                console.log(`New patrol point set in opposite direction: (${this.patrolPoints[0].x}, ${this.patrolPoints[0].y}), direction: ${oppositeDirection > 0 ? 'right' : 'left'}`);
+              }
+            }
+            
+            // 重置卡住检测
+            this.stuckAccumulatedTime = 0;
+            this.lastPatrolWait = time;
+            return;
+          }
+        } else {
+          // 移动正常，重置卡住累计时间
+          this.stuckAccumulatedTime = 0;
+        }
+        
+        // 更新位置检查点和时间
+        this.lastPosition = { x: this.sprite.x, y: this.sprite.y };
+        this.lastPositionUpdateTime = time;
+      }
     }
   }
   

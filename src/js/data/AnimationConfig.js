@@ -54,6 +54,24 @@ const ANIMATION_CONFIGS = {
           offsetX: 0,          // X轴偏移（剑伸出的距离）
           offsetY: -15         // Y轴偏移（攻击框向上的偏移）
         }
+      },
+      // 重斩技能动画配置
+      heavy_slash: {
+        keyFrame: {
+          frameNumber: 15       // 重斩关键帧（30帧动画的50%处）
+        }
+      },
+      // 旋风斩技能动画配置
+      whirlwind: {
+        keyFrame: {
+          frameNumber: 14       // 旋风斩关键帧（28帧动画的50%处）
+        }
+      },
+      // 战吼技能动画配置
+      battle_cry: {
+        keyFrame: {
+          frameNumber: 14       // 战吼关键帧（27帧动画的50%处）
+        }
       }
     },
     animations: {
@@ -94,6 +112,45 @@ const ANIMATION_CONFIGS = {
           suffix: '.png'
         },
         frameRate: 15,
+        repeat: 0
+      },
+      heavy_slash: {
+        key: 'warrior_heavy_slash',
+        frames: {
+          type: 'frameNames',
+          prefix: '战士重斩_frame_',
+          start: 1,
+          end: 30,
+          zeroPad: 6,
+          suffix: '.png'
+        },
+        frameRate: 20,
+        repeat: 0
+      },
+      whirlwind: {
+        key: 'warrior_whirlwind',
+        frames: {
+          type: 'frameNames',
+          prefix: '战士旋风斩_frame_',
+          start: 1,
+          end: 28,
+          zeroPad: 6,
+          suffix: '.png'
+        },
+        frameRate: 16,
+        repeat: 0
+      },
+      battle_cry: {
+        key: 'warrior_battle_cry',
+        frames: {
+          type: 'frameNames',
+          prefix: '战士战吼_frame_',
+          start: 1,
+          end: 27,
+          zeroPad: 6,
+          suffix: '.png'
+        },
+        frameRate: 12,
         repeat: 0
       },
       jump: {

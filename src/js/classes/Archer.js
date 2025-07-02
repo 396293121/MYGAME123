@@ -3,19 +3,22 @@
  * 高攻高速较低物防较低魔防，远程攻击武器为弓箭
  */
 import Character from './Character.js';
+import { getCharacterConfig } from '../data/CharacterConfig.js';
 
 class Archer extends Character {
   constructor(scene, x, y) {
     // 使用射手的默认纹理
     super(scene, x, y, 'archer', 0);
     
-    // 射手特有属性调整
-    this.attributes = {
-      strength: 6,      // 射手力量中等偏高
-      agility: 9,       // 射手敏捷高
-      vitality: 4,      // 射手体力较低
-      intelligence: 4   // 射手智力较低
-    };
+    // 从配置文件获取射手配置
+    const config = getCharacterConfig('archer');
+    if (!config) {
+      console.error('Archer config not found, using default values');
+      return;
+    }
+    
+    // 使用配置文件中的属性
+    this.attributes = { ...config.attributes };
     
     // 更新衍生属性
     this.updateStats();

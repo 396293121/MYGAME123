@@ -40,10 +40,21 @@ const PHYSICS_CONFIG = {
   MOVEMENT_THRESHOLD: 5
 };
 
+// 卡住检测配置常量
+const STUCK_DETECTION_CONFIG = {
+  // 检测时间间隔（毫秒）
+  CHECK_INTERVAL: 2000,
+  // 卡住判定时间（毫秒）
+  STUCK_TIME_THRESHOLD: 5000,
+  // 最小移动距离（像素）
+  MIN_MOVEMENT_DISTANCE: 20
+};
+
 const EnemyConfig = {
   // 通用配置
   TIMING: TIMING_CONFIG,
   PHYSICS: PHYSICS_CONFIG,
+  STUCK_DETECTION: STUCK_DETECTION_CONFIG,
   
   // 野猪配置
   WILD_BOAR: {
@@ -129,7 +140,7 @@ const EnemyConfig = {
     enhancedAnimation: {
       charge: {
         speedMultiplier: 2.0,
-        duration: 1000,
+        duration: 1500,
         cooldown: 5000,
         stunDuration: 1500,
         frameRateMultiplier: 1.5
@@ -674,6 +685,14 @@ class EnemyConfigManager {
   static getPhysicsConfig() {
     return PHYSICS_CONFIG;
   }
+  
+  /**
+   * 获取卡住检测配置
+   * @returns {Object} 卡住检测配置
+   */
+  static getStuckDetectionConfig() {
+    return STUCK_DETECTION_CONFIG;
+  }
 }
 
 // 向后兼容性支持
@@ -684,5 +703,5 @@ Object.keys(EnemyConfig).forEach(key => {
   }
 });
 
-export { EnemyConfig, EnemyConfigManager, TIMING_CONFIG, PHYSICS_CONFIG };
+export { EnemyConfig, EnemyConfigManager, TIMING_CONFIG, PHYSICS_CONFIG, STUCK_DETECTION_CONFIG };
 export default EnemyData; // 保持向后兼容性

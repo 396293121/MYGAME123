@@ -25,6 +25,11 @@ class InputManager {
     // 创建攻击键
     this.actionKeys.attack = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     
+    // 创建技能键
+    this.actionKeys.heavySlash = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+    this.actionKeys.whirlwind = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+    this.actionKeys.battleCry = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    
     // 创建暂停键
     this.actionKeys.pause = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     this.addKeyListener(this.actionKeys.pause, 'down', () => {
@@ -50,12 +55,42 @@ class InputManager {
    * 在场景的update方法中调用
    */
   update() {
+    if (!this.scene.player) return;
+    
     // 处理攻击输入
-    if (this.actionKeys.attack && this.actionKeys.attack.isDown && this.scene.player && this.scene.player.canAttack) {
+    if (this.actionKeys.attack && this.actionKeys.attack.isDown && this.scene.player.canAttack) {
       const attackInfo = this.scene.player.attack();
       // 攻击已启动，伤害判定将在动画关键帧时通过事件系统处理
       if (attackInfo && attackInfo.initiated) {
         console.log('Player attack initiated:', attackInfo);
+      }
+    }
+    
+    // 处理技能输入
+    if (this.actionKeys.heavySlash && Phaser.Input.Keyboard.JustDown(this.actionKeys.heavySlash)) {
+      if (this.scene.player.heavySlash && typeof this.scene.player.heavySlash === 'function') {
+        const skillUsed = this.scene.player.heavySlash();
+        if (skillUsed) {
+          console.log('Heavy Slash skill activated');
+        }
+      }
+    }
+    
+    if (this.actionKeys.whirlwind && Phaser.Input.Keyboard.JustDown(this.actionKeys.whirlwind)) {
+      if (this.scene.player.whirlwind && typeof this.scene.player.whirlwind === 'function') {
+        const skillUsed = this.scene.player.whirlwind();
+        if (skillUsed) {
+          console.log('Whirlwind skill activated');
+        }
+      }
+    }
+    
+    if (this.actionKeys.battleCry && Phaser.Input.Keyboard.JustDown(this.actionKeys.battleCry)) {
+      if (this.scene.player.battleCry && typeof this.scene.player.battleCry === 'function') {
+        const skillUsed = this.scene.player.battleCry();
+        if (skillUsed) {
+          console.log('Battle Cry skill activated');
+        }
       }
     }
   }

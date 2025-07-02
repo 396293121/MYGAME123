@@ -80,7 +80,7 @@
         <key>maxTextureSize</key>
         <QSize>
             <key>width</key>
-            <int>3000</int>
+            <int>2048</int>
             <key>height</key>
             <int>2048</int>
         </QSize>
@@ -128,7 +128,7 @@
             </struct>
         </map>
         <key>multiPackMode</key>
-        <enum type="SettingsBase::MultiPackMode">MultiPackOff</enum>
+        <enum type="SettingsBase::MultiPackMode">MultiPackAuto</enum>
         <key>forceIdenticalLayout</key>
         <false/>
         <key>outputFormat</key>
@@ -203,6 +203,33 @@
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士受伤_frame_000028.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士受伤_frame_000029.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士受伤_frame_000030.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000001.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000002.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000003.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000004.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000005.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000006.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000007.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000008.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000009.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000010.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000011.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000012.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000013.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000014.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000015.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000016.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000017.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000018.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000019.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000020.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000021.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000022.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000023.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000024.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000025.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000026.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000027.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士攻击_frame_000001.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士攻击_frame_000004.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士攻击_frame_000005.png</key>
@@ -210,6 +237,34 @@
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士攻击_frame_000007.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士攻击_frame_000009.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士攻击_frame_000010.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000001.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000002.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000003.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000004.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000005.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000006.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000007.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000008.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000009.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000010.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000011.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000012.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000013.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000014.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000015.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000016.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000017.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000018.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000019.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000020.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000021.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000022.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000023.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000024.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000025.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000026.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000027.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000028.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士死亡_frame_000001.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士死亡_frame_000002.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士死亡_frame_000003.png</key>
@@ -316,6 +371,36 @@
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士跳跃_frame_000015.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士跳跃_frame_000016.png</key>
             <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士跳跃_frame_000017.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000001.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000002.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000003.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000004.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000005.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000006.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000007.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000008.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000009.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000010.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000011.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000012.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000013.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000014.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000015.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000016.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000017.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000018.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000019.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000020.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000021.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000022.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000023.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000024.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000025.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000026.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000027.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000028.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000029.png</key>
+            <key type="filename">../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000030.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -480,6 +565,91 @@
                     <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士受伤_frame_000028.png</filename>
                     <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士受伤_frame_000029.png</filename>
                     <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士受伤_frame_000030.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000001.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000002.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000003.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000004.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000005.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000006.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000007.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000008.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000009.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000010.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000011.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000012.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000013.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000014.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000015.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000016.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000017.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000018.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000019.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000020.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000021.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000022.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000023.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000024.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000025.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000026.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000027.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000028.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000029.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士重斩_frame_000030.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000001.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000002.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000003.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000004.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000005.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000006.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000007.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000008.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000009.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000010.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000011.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000012.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000013.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000014.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000015.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000016.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000017.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000018.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000019.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000020.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000021.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000022.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000023.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000024.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000025.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000026.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士战吼_frame_000027.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000001.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000002.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000003.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000004.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000005.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000006.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000007.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000008.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000009.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000010.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000011.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000012.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000013.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000014.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000015.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000016.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000017.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000018.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000019.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000020.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000021.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000022.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000023.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000024.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000025.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000026.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000027.png</filename>
+                    <filename>../../../../../../../../Downloads/AI生成资源/精灵图AI千万别删/123/战士旋风斩_frame_000028.png</filename>
                 </array>
             </struct>
         </map>

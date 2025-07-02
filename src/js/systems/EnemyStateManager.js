@@ -2,6 +2,7 @@
  * 敌人状态管理器
  * 统一管理所有敌人的状态转换和行为逻辑，消除代码重复
  */
+import { EnemyConfigManager } from '../data/EnemyConfig.js';
 import Logger from './Logger.js';
 
 class EnemyStateManager {
@@ -138,7 +139,6 @@ class EnemyStateManager {
       cachedBehavior.call(enemy, time, player);
       return;
     }
-console.log(enemy.currentState)
     // 执行对应行为并缓存
     let behavior;
     switch (enemy.currentState) {
@@ -187,7 +187,7 @@ console.log(enemy.currentState)
       this.sprite.x, this.sprite.y,
       currentTarget.x, currentTarget.y
     );
-
+    console.log(88888)
     if (distance < 10) {
       // 到达巡逻点，等待或移动到下一个点
       if (time - this.lastPatrolWait > this.patrolWaitTime) {
@@ -207,6 +207,42 @@ console.log(enemy.currentState)
       
       this.sprite.body.setVelocity(velocityX, velocityY);
       this.sprite.setFlipX(velocityX < 0);
+    }
+    
+    // 卡住检测逻辑（使用配置参数）
+    const stuckConfig = EnemyConfigManager.getStuckDetectionConfig();
+    
+    if (!this.lastPosition) {
+      this.lastPosition = { x: this.sprite.x, y: this.sprite.y };
+      this.stuckCheckTime = time;
+    } else {
+      // 计算移动距离
+      const moveDistance = Phaser.Math.Distance.Between(
+        this.lastPosition.x, this.lastPosition.y,
+        this.sprite.x, this.sprite.y
+      );
+      
+      // 使用配置参数进行卡住检测
+      if (time - this.stuckCheckTime > stuckConfig.STUCK_TIME_THRESHOLD && 
+          moveDistance < stuckConfig.MIN_MOVEMENT_DISTANCE) {
+        Logger.debug(`Enemy stuck detected! Moving distance: ${moveDistance}, resetting patrol points at (${this.sprite.x}, ${this.sprite.y})`);
+        // 在当前位置重新设置巡逻点
+        if (this.setupPatrolPoints) {
+          this.setupPatrolPoints(this.sprite.x, this.sprite.y);
+          Logger.debug('Patrol points reset successfully');
+        }
+        this.lastPatrolWait = time;
+        this.lastPosition = null;
+        this.stuckCheckTime = time;
+        return;
+      }
+      
+      // 使用配置参数更新位置检查间隔
+      if (time - this.stuckCheckTime > stuckConfig.CHECK_INTERVAL) {
+        Logger.debug(`Updating stuck check position: (${this.sprite.x}, ${this.sprite.y})`);
+        this.lastPosition = { x: this.sprite.x, y: this.sprite.y };
+        this.stuckCheckTime = time;
+      }
     }
   }
 

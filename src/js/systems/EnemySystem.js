@@ -1033,14 +1033,18 @@ class EnemySystem {
       return;
     }
     
+    const attackType = attackInfo.attackType || 'single';
+    
     Logger.debug('Processing player attack hit', {
       damage: attackInfo.damage,
       direction: attackInfo.direction,
+      attackType: attackType,
       timestamp: attackInfo.timestamp
     });
     
     // 检测攻击区域内的敌人
-    let hitCount = 0;
+    const overlappingEnemies = [];
+    
     this.enemies.forEach(enemy => {
       // 创建敌人的物理碰撞框矩形
       // 使用物理体的实际世界坐标，而不是精灵坐标加偏移
@@ -1053,39 +1057,71 @@ class EnemySystem {
       
       // 检查攻击区域与敌人物理体是否重叠
       if (Phaser.Geom.Rectangle.Overlaps(attackInfo.area, enemyRect)) {
-        // 对敌人造成伤害
-        this.damageEnemy(enemy, attackInfo.damage);
-        hitCount++;
+        // 计算敌人与攻击者的距离
+        const distance = Phaser.Math.Distance.Between(
+          attackInfo.attacker.sprite.x,
+          attackInfo.attacker.sprite.y,
+          enemy.sprite.x,
+          enemy.sprite.y
+        );
         
-        // 播放命中音效
-        if (attackInfo.attacker && attackInfo.attacker.audioManager) {
-          attackInfo.attacker.audioManager.playCharacterSound(
-            attackInfo.attacker.characterType, 
-            'attack', 
-            'hit'
-          );
-        }
-        
-        // 如果是野猪类型的敌人，有概率停止冲锋
-        if (enemy.constructor.name === 'WildBoar' && enemy.isCharging) {
-          // WildBoar类的takeDamage方法已经处理了这个逻辑
-        }
-        
-        // 发布敌人被攻击事件
-        if (window.eventBus) {
-          window.eventBus.emit('enemyHit', {
-            enemy: enemy,
-            attacker: attackInfo.attacker,
-            damage: attackInfo.damage,
-            timestamp: Date.now()
-          });
-        }
+        overlappingEnemies.push({ enemy, distance });
+      }
+    });
+    
+    // 根据攻击类型处理敌人
+    let enemiesToHit = [];
+    
+    if (attackType === 'single') {
+      // 单体攻击：只攻击最近的一个敌人
+      if (overlappingEnemies.length > 0) {
+        // 按距离排序，取最近的敌人
+        overlappingEnemies.sort((a, b) => a.distance - b.distance);
+        enemiesToHit = [overlappingEnemies[0]];
+      }
+    } else if (attackType === 'aoe') {
+      // 群体攻击：攻击所有重叠的敌人
+      enemiesToHit = overlappingEnemies;
+    }
+    
+    // 对选中的敌人造成伤害
+    let hitCount = 0;
+    enemiesToHit.forEach(({ enemy }) => {
+      // 对敌人造成伤害
+      this.damageEnemy(enemy, attackInfo.damage);
+      hitCount++;
+      
+      // 播放命中音效
+      if (attackInfo.attacker && attackInfo.attacker.audioManager) {
+        attackInfo.attacker.audioManager.playCharacterSound(
+          attackInfo.attacker.characterType, 
+          'attack', 
+          'hit'
+        );
+      }
+      
+      // 如果是野猪类型的敌人，有概率停止冲锋
+      if (enemy.constructor.name === 'WildBoar' && enemy.isCharging) {
+        // WildBoar类的takeDamage方法已经处理了这个逻辑
+      }
+      
+      // 发布敌人被攻击事件
+      if (window.eventBus) {
+        window.eventBus.emit('enemyHit', {
+          enemy: enemy,
+          attacker: attackInfo.attacker,
+          damage: attackInfo.damage,
+          attackType: attackType,
+          timestamp: Date.now()
+        });
       }
     });
     
     // 记录攻击统计
     if (hitCount > 0) {
-      Logger.debug(`Player attack hit ${hitCount} enemies`);
+      Logger.debug(`Player ${attackType} attack hit ${hitCount} enemies`);
+    } else {
+      Logger.debug(`Player ${attackType} attack missed all targets`);
     }
   }
   

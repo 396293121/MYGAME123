@@ -69,8 +69,8 @@ class TestScene extends Phaser.Scene {
     this.load.image('stone', 'assets/maps/tilesets/stone.png');
     
     // 加载角色精灵图 - JSON格式
-    // 加载新的统一战士精灵图（213x144尺寸）
-    this.load.atlas('warrior_sprite2', 'assets/images/characters/warrior/sprite/warrior_sprite2.png', 'assets/images/characters/warrior/sprite/warrior_sprite2.json');
+    // 加载新的统一战士精灵图（213x144尺寸）- 多文件打包
+    this.load.multiatlas('warrior_sprite2', 'assets/images/characters/warrior/sprite/warrior_sprite2.json', 'assets/images/characters/warrior/sprite');
     // 加载敌人精灵图
     // 加载敌人精灵图 - 野猪JSON格式精灵图
     this.load.multiatlas('wild_boar_sprite', 'assets/images/enemies/wild_boar/wild_boar_sprite.json', 'assets/images/enemies/wild_boar');
@@ -381,7 +381,6 @@ this.load.spritesheet('items', 'assets/images/items/items_spritesheet.png', {
         const mapWaveConfig = {
           enemies: []
         };
-        
         enemySpawns.forEach(spawn => {
           // 获取敌人类型，默认为wild_boar
           const enemyType = spawn.properties?.find(prop => prop.name === 'enemyType')?.value || 'wild_boar';

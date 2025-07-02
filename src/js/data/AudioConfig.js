@@ -204,7 +204,7 @@ const AUDIO_CONFIGS = {
     // 音效淡入淡出时间
     fadeTime: 100,
     // 最大同时播放的相同音效数量
-    maxConcurrentSounds: 3
+    maxConcurrentSounds: 5
   }
 };
 
@@ -269,7 +269,6 @@ class AudioManager {
       console.warn(`音效 ${soundConfig.key} 达到最大并发数量限制 (${this.config.global.maxConcurrentSounds})`);
       return null;
     }
-    console.log(playOptions,91919)
     // 创建音效实例并播放
     const sound = this.scene.sound.add(soundConfig.key, playOptions);
     

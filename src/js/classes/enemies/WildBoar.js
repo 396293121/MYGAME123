@@ -287,7 +287,7 @@ class WildBoar extends Enemy {
   }
   
   /**
-   * 执行当前状态对应的行为（使用状态管理器）
+   * 执行当前状态对应的行为（统一使用状态管理器）
    */
   executeBehavior(time, player) {
     // 处理野猪特有的状态
@@ -303,32 +303,12 @@ class WildBoar extends Enemy {
       return;
     }
     
-    // 使用野猪自己的行为方法
-    switch (this.currentState) {
-      case this.states.IDLE:
-        // 停止移动
-        if (this.sprite && this.sprite.body) {
-          this.sprite.body.setVelocity(0, 0);
-        }
-        break;
-        
-      case this.states.PATROL:
-        // 使用状态管理器的巡逻行为
-        EnemyStateManager.executeBehavior(this, time, player);
-        break;
-        
-      case this.states.CHASE:
-        this.chaseBehavior(player);
-        break;
-        
-      case this.states.ATTACK:
-        this.attackBehavior(player);
-        break;
-    }
+    // 统一使用状态管理器处理所有标准行为
+    EnemyStateManager.executeBehavior(this, time, player);
   }
   
   /**
-   * 追击行为
+   * 追击行为（野猪特有实现）
    */
   chaseBehavior(player) {
     if (!player || !player.sprite) return;
@@ -341,6 +321,16 @@ class WildBoar extends Enemy {
     
     // 设置精灵朝向（向左时翻转，向右时不翻转）
     this.sprite.setFlipX(direction < 0);
+  }
+  
+  /**
+   * 闲置行为（野猪特有实现）
+   */
+  idleBehavior(time) {
+    // 停止移动
+    if (this.sprite && this.sprite.body) {
+      this.sprite.body.setVelocity(0, 0);
+    }
   }
   
   /**
@@ -389,6 +379,10 @@ class WildBoar extends Enemy {
     }
     const currentAnim = this.sprite.anims.currentAnim;
     const currentKey = currentAnim ? currentAnim.key : null;
+    
+    // 检查是否真的在移动（基于速度）
+    const isMoving = this.sprite.body && (Math.abs(this.sprite.body.velocity.x) > 5 || Math.abs(this.sprite.body.velocity.y) > 5);
+    
     // 根据当前状态播放相应动画
     switch (this.currentState) {
       case this.states.IDLE:
@@ -398,6 +392,19 @@ class WildBoar extends Enemy {
         break;
         
       case this.states.PATROL:
+        // 巡逻状态下，根据实际移动情况播放动画
+        if (isMoving) {
+          if (!currentKey || !currentKey.includes('move')) {
+            this.playAnimation('move');
+          }
+        } else {
+          // 在巡逻点等待时播放闲置动画
+          if (!currentKey || !currentKey.includes('idle')) {
+            this.playAnimation('idle');
+          }
+        }
+        break;
+        
       case this.states.CHASE:
         if (!currentKey || !currentKey.includes('move')) {
           this.playAnimation('move');

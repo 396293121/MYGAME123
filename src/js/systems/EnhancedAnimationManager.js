@@ -107,23 +107,47 @@ class EnhancedAnimationManager extends AnimationManager {
    */
   setupAttackKeyFrames(characterType) {
     const config = ANIMATION_CONFIGS[characterType];
-    if (!config || !config.animations.attack || !config.enhancedAnimation?.attack) {
+    if (!config) {
       return;
     }
 
-    const attackConfig = config.animations.attack;
-    const enhancedConfig = config.enhancedAnimation.attack;
-    const totalFrames = attackConfig.frames.end - attackConfig.frames.start + 1;
-    
-    // 从配置文件读取关键帧的具体帧数
-    const keyFrame = enhancedConfig.keyFrame.frameNumber || 1;
-    
-    // 存储关键帧信息
-    this.keyFrameEvents.set(`${characterType}_attack`, {
-      keyFrame: keyFrame,
-      totalFrames: totalFrames,
-      eventTriggered: false,
-      config: enhancedConfig // 存储配置以供后续使用
+    // 设置普通攻击动画的关键帧
+    if (config.animations.attack && config.enhancedAnimation?.attack) {
+      const attackConfig = config.animations.attack;
+      const enhancedConfig = config.enhancedAnimation.attack;
+      const totalFrames = attackConfig.frames.end - attackConfig.frames.start + 1;
+      
+      // 从配置文件读取关键帧的具体帧数
+      const keyFrame = enhancedConfig.keyFrame.frameNumber || 1;
+      
+      // 存储关键帧信息
+      this.keyFrameEvents.set(`${characterType}_attack`, {
+        keyFrame: keyFrame,
+        totalFrames: totalFrames,
+        eventTriggered: false,
+        config: enhancedConfig // 存储配置以供后续使用
+      });
+    }
+
+    // 设置技能动画的关键帧
+    const skillAnimations = ['heavy_slash', 'whirlwind', 'battle_cry'];
+    skillAnimations.forEach(skillType => {
+      if (config.animations[skillType] && config.enhancedAnimation?.[skillType]) {
+        const skillConfig = config.animations[skillType];
+        const enhancedConfig = config.enhancedAnimation[skillType];
+        const totalFrames = skillConfig.frames.end - skillConfig.frames.start + 1;
+        
+        // 从配置文件读取关键帧的具体帧数
+        const keyFrame = enhancedConfig.keyFrame.frameNumber || 1;
+        
+        // 存储关键帧信息
+        this.keyFrameEvents.set(`${characterType}_${skillType}`, {
+          keyFrame: keyFrame,
+          totalFrames: totalFrames,
+          eventTriggered: false,
+          config: enhancedConfig // 存储配置以供后续使用
+        });
+      }
     });
   }
 
@@ -145,6 +169,11 @@ class EnhancedAnimationManager extends AnimationManager {
     // 处理攻击动画的关键帧事件
     if (animationType === 'attack') {
       return this.playAttackAnimation(sprite, characterType, originalTextureKey, onComplete, onKeyFrame);
+    }
+    
+    // 处理技能动画的关键帧事件（重斩、旋风斩、战吼等技能）
+    if (animationType === 'heavy_slash' || animationType === 'whirlwind' || animationType === 'battle_cry') {
+      return this.playAttackAnimation(sprite, characterType, originalTextureKey, onComplete, onKeyFrame, animationType);
     }
     
     // 其他动画使用基础播放方法
@@ -226,15 +255,15 @@ class EnhancedAnimationManager extends AnimationManager {
    * @param {string} originalTextureKey - 原始纹理键
    * @param {Function} onComplete - 动画完成回调
    * @param {Function} onKeyFrame - 关键帧回调
+   * @param {string} animationType - 动画类型（默认为'attack'，也可以是技能动画）
    */
-  playAttackAnimation(sprite, characterType, originalTextureKey, onComplete = null, onKeyFrame = null) {
+  playAttackAnimation(sprite, characterType, originalTextureKey, onComplete = null, onKeyFrame = null, animationType = 'attack') {
     const config = ANIMATION_CONFIGS[characterType];
-    if (!config || !config.animations.attack) {
+    if (!config || !config.animations[animationType]) {
       return false;
     }
-
-    const animKey = config.animations.attack.key;
-    const keyFrameInfo = this.keyFrameEvents.get(`${characterType}_attack`);
+    const animKey = config.animations[animationType].key;
+    const keyFrameInfo = this.keyFrameEvents.get(`${characterType}_${animationType}`);
     
     if (!this.scene.anims.exists(animKey)) {
       return false;
@@ -245,7 +274,7 @@ class EnhancedAnimationManager extends AnimationManager {
       keyFrameInfo.eventTriggered = false;
     }
 
-    // 播放攻击动画
+    // 播放动画
     sprite.anims.play(animKey, true);
     
     // 监听动画帧更新事件
