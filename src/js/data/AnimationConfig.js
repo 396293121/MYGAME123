@@ -172,11 +172,11 @@ const ANIMATION_CONFIGS = {
           type: 'frameNames',
           prefix: '战士受伤_frame_',
           start: 1,
-          end: 30,
+          end: 8,
           zeroPad: 6,
           suffix: '.png'
         },
-        frameRate: 12,
+        frameRate: 16,
         repeat: 0
       },
       die: {

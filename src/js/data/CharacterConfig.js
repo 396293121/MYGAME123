@@ -18,6 +18,16 @@ const CHARACTER_CONFIGS = {
     weaponType: 'sword',
     attackRange: 'melee', // 近战攻击
     
+    // 技能键位映射配置
+    skillKeyMappings: {
+      'Q': { skillId: 'heavy_slash', methodName: 'heavySlash' },
+      'W': { skillId: 'whirlwind', methodName: 'whirlwind' },
+      'E': { skillId: 'battle_cry', methodName: 'battleCry' }
+    },
+    
+    // 技能动画列表
+    skillAnimations: ['heavy_slash', 'whirlwind', 'battle_cry'],
+    
     // 技能配置
     classSkills: {
       HEAVY_SLASH: {
@@ -37,10 +47,10 @@ const CHARACTER_CONFIGS = {
         attackType: 'aoe',
         // 旋风斩攻击范围配置
         attackArea: {
-          width: 150,
-          height: 150,
-          offsetX: 0,
-          offsetY: -75  // 调整Y偏移，使攻击判定矩形框底部中心与角色脚底中心对齐
+          width: 195,
+          height: 144,
+          offsetX: -92.5,
+          offsetY: 0  // 调整Y偏移，使攻击判定矩形框底部中心与角色脚底中心对齐
         }
       },
       BATTLE_CRY: {
@@ -72,6 +82,17 @@ const CHARACTER_CONFIGS = {
     },
     weaponType: 'staff',
     attackRange: 'ranged',
+    
+    // 技能键位映射配置
+    skillKeyMappings: {
+      'Q': { skillId: 'fireball', methodName: 'fireball' },
+      'W': { skillId: 'ice_shard', methodName: 'iceShard' },
+      'E': { skillId: 'lightning_bolt', methodName: 'lightningBolt' }
+    },
+    
+    // 技能动画列表
+    skillAnimations: ['fireball', 'ice_shard', 'lightning_bolt'],
+    
     classSkills: {
       // 法师技能配置可在此添加
     }
@@ -87,6 +108,17 @@ const CHARACTER_CONFIGS = {
     },
     weaponType: 'bow',
     attackRange: 'ranged',
+    
+    // 技能键位映射配置
+    skillKeyMappings: {
+      'Q': { skillId: 'power_shot', methodName: 'powerShot' },
+      'W': { skillId: 'multi_shot', methodName: 'multiShot' },
+      'E': { skillId: 'explosive_arrow', methodName: 'explosiveArrow' }
+    },
+    
+    // 技能动画列表
+    skillAnimations: ['power_shot', 'multi_shot', 'explosive_arrow'],
+    
     classSkills: {
       // 弓箭手技能配置可在此添加
     }

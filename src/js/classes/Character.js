@@ -2,6 +2,8 @@
 import { ANIMATION_CONFIGS } from '../data/AnimationConfig.js';
 import EnhancedAnimationManager from '../systems/EnhancedAnimationManager.js';
 import { AudioManager } from '../data/AudioConfig.js';
+import { getCharacterConfig } from '../data/CharacterConfig.js';
+import SkillConfigHelper from '../utils/SkillConfigHelper.js';
 
 /**
  * 角色基类
@@ -88,7 +90,6 @@ class Character {
   // 更新角色状态
   update(cursors) {
     if (!cursors) return;
-    console.log(9999)
     // 处理移动
     this.handleMovement(cursors);
     
@@ -157,6 +158,7 @@ class Character {
   
   // 处理角色跳跃
   handleJump(cursors) {
+    if(this.isUsingSkill||this.state=='attack') return;
     if (cursors.up.isDown && this.sprite.body.onFloor()) {
       this.sprite.setVelocityY(-this.stats.jumpForce);
       // 播放跳跃音效
@@ -284,7 +286,7 @@ class Character {
     
     // 统一使用配置文件中的offsetX和offsetY来决定攻击区域
     const attackArea = new Phaser.Geom.Rectangle(
-      this.sprite.x + (direction > 0 ? offsetX : -attackWidth), // 根据方向和配置的offsetX调整位置
+      this.sprite.x + (direction > 0 ? offsetX : -attackWidth-offsetX), // 根据方向和配置的offsetX调整位置
       this.sprite.y - attackHeight + offsetY, // 使用配置的offsetY调整Y坐标
       attackWidth,
       attackHeight
@@ -382,19 +384,6 @@ class Character {
     
     // 播放受伤动画和音效
     this.playAnimation('hurt');
-    
-    // 监听动画完成事件，完成后恢复到站立状态
-    this.sprite.once('animationcomplete', (animation) => {
-      if (animation.key.includes('_hurt')) {
-        // 受伤动画完成后，如果角色在地面上，恢复到站立状态
-        if (this.sprite.body.onFloor()) {
-          this.playAnimation('idle');
-        } else {
-          // 如果在空中，恢复到跳跃状态
-          this.playAnimation('jump');
-        }
-      }
-    });
     
     // 击退效果
     if (attacker) {
@@ -518,13 +507,21 @@ class Character {
 
     
   /**
+   * 获取角色配置
+   * @returns {Object|null} 角色配置对象
+   */
+  getCharacterConfig() {
+    return getCharacterConfig(this.characterType);
+  }
+
+  /**
    * 播放指定动画
    * @param {string} animationKey - 动画键名后缀，如'idle', 'move', 'attack'等
    * @param {Function} onKeyFrame - 关键帧回调（用于攻击判定）
    */
   playAnimation(animationKey, onKeyFrame = null) {
     // 检查是否为技能动画
-    const skillAnimations = ['heavy_slash', 'whirlwind', 'battle_cry'];
+    const skillAnimations = SkillConfigHelper.getSkillAnimations(this.characterType);
     if (skillAnimations.includes(animationKey)) {
       this.isUsingSkill = true;
       this.currentSkill = animationKey;
@@ -551,7 +548,7 @@ class Character {
    */
   onAnimationComplete(animationKey) {
     // 检查是否为技能动画，如果是则重置技能状态
-    const skillAnimations = ['heavy_slash', 'whirlwind', 'battle_cry'];
+    const skillAnimations = SkillConfigHelper.getSkillAnimations(this.characterType);
     
     if (skillAnimations.includes(animationKey)) {
       // 重置技能状态
@@ -563,6 +560,23 @@ class Character {
         this.playAnimation('move');
       } else {
         this.playAnimation('idle');
+      }
+      return;
+    }
+    
+    // 处理受伤动画完成
+    if (animationKey === 'hurt') {
+      // 受伤动画完成后，根据角色状态恢复到合适的动画
+      if (this.sprite.body.onFloor()) {
+        // 检查是否有移动输入
+        if (Math.abs(this.sprite.body.velocity.x) > 0) {
+          this.playAnimation('move');
+        } else {
+          this.playAnimation('idle');
+        }
+      } else {
+        // 如果在空中，恢复到跳跃状态
+        this.playAnimation('jump');
       }
       return;
     }
@@ -622,8 +636,7 @@ class Character {
   setupPhysicsBody() {
     if (this.sprite && this.sprite.body) {
       // 从动画配置中获取物理体配置
-      const config = this.animationManager.getCharacterConfig(this.characterType);
-      
+      const config = ANIMATION_CONFIGS[this.characterType]
       if (config && config.physicsBody) {
         const physicsConfig = config.physicsBody;
         
@@ -644,7 +657,7 @@ class Character {
         // 如果没有物理体配置，使用默认值
         console.warn(`No physics body config found for character type: ${this.characterType}`);
         this.sprite.body.setSize(41, 94);
-        this.sprite.body.setOffset(-20.5, -144);
+        this.sprite.body.setOffset(0, 0);
       }
     }
   }

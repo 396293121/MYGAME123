@@ -249,7 +249,7 @@ class EnemyStateManager {
   /**
    * 默认追击行为
    */
-  defaultChaseBehavior(player) {
+  defaultChaseBehavior(time, player) {
     if (!player || !player.sprite || !this.sprite || !this.sprite.body) {
       return;
     }
@@ -270,7 +270,7 @@ class EnemyStateManager {
   /**
    * 默认攻击行为
    */
-  defaultAttackBehavior(player) {
+  defaultAttackBehavior(time, player) {
     if (!this.canAttack) return;
     
     // 停止移动

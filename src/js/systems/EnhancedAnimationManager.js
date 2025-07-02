@@ -4,6 +4,8 @@
  */
 import AnimationManager from './AnimationManager.js';
 import ANIMATION_CONFIGS from '../data/AnimationConfig.js';
+import { getCharacterConfig } from '../data/CharacterConfig.js';
+import SkillConfigHelper from '../utils/SkillConfigHelper.js';
 
 class EnhancedAnimationManager extends AnimationManager {
   constructor(scene) {
@@ -21,6 +23,15 @@ class EnhancedAnimationManager extends AnimationManager {
       FALLING: 'falling',
       LANDING: 'landing'
     };
+  }
+
+  /**
+   * 获取角色配置
+   * @param {string} characterType - 角色类型
+   * @returns {Object|null} 角色配置对象
+   */
+  getCharacterConfig(characterType) {
+    return getCharacterConfig(characterType);
   }
 
   /**
@@ -130,7 +141,8 @@ class EnhancedAnimationManager extends AnimationManager {
     }
 
     // 设置技能动画的关键帧
-    const skillAnimations = ['heavy_slash', 'whirlwind', 'battle_cry'];
+ 
+    const skillAnimations = SkillConfigHelper.getSkillAnimations(characterType);
     skillAnimations.forEach(skillType => {
       if (config.animations[skillType] && config.enhancedAnimation?.[skillType]) {
         const skillConfig = config.animations[skillType];
@@ -172,7 +184,7 @@ class EnhancedAnimationManager extends AnimationManager {
     }
     
     // 处理技能动画的关键帧事件（重斩、旋风斩、战吼等技能）
-    if (animationType === 'heavy_slash' || animationType === 'whirlwind' || animationType === 'battle_cry') {
+    if (SkillConfigHelper.isSkillAnimation(characterType, animationType)) {
       return this.playAttackAnimation(sprite, characterType, originalTextureKey, onComplete, onKeyFrame, animationType);
     }
     

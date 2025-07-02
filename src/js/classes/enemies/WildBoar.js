@@ -310,14 +310,16 @@ class WildBoar extends Enemy {
   /**
    * 追击行为（野猪特有实现）
    */
-  chaseBehavior(player) {
-    if (!player || !player.sprite) return;
+  chaseBehavior(time, player) {
+    if (!player || !player.sprite || !this.sprite || !this.sprite.body) {
+      return;
+    }
     
     // 计算方向
     const direction = player.sprite.x > this.sprite.x ? 1 : -1;
     
-    // 设置速度
-    this.sprite.setVelocityX(direction * this.speed);
+    // 只设置X轴速度，保持重力对Y轴的影响
+    this.sprite.body.setVelocityX(direction * this.speed);
     
     // 设置精灵朝向（向左时翻转，向右时不翻转）
     this.sprite.setFlipX(direction < 0);
@@ -327,9 +329,9 @@ class WildBoar extends Enemy {
    * 闲置行为（野猪特有实现）
    */
   idleBehavior(time) {
-    // 停止移动
+    // 停止水平移动，保持重力对Y轴的影响
     if (this.sprite && this.sprite.body) {
-      this.sprite.body.setVelocity(0, 0);
+      this.sprite.body.setVelocityX(0);
     }
   }
   
@@ -350,11 +352,11 @@ class WildBoar extends Enemy {
   /**
    * 攻击行为
    */
-  attackBehavior(player) {
+  attackBehavior(time, player) {
     if (!player || !player.sprite) return;
     
-    // 停止移动
-    this.sprite.setVelocity(0);
+    // 停止水平移动，保持重力对Y轴的影响
+    this.sprite.body.setVelocityX(0);
     
     // 如果可以攻击
     if (this.canAttack) {
@@ -479,11 +481,11 @@ class WildBoar extends Enemy {
       if (distance === 0) {
         // 碰撞框重叠，使用统一的攻击行为
         this.setState(this.states.ATTACK);
-        this.attackBehavior(player);
+        this.attackBehavior(time, player);
       } else if (distance > 0 && distance < this.chargeMinDistance) {
         // 距离太近无法冲锋，使用统一的攻击行为
         this.setState(this.states.ATTACK);
-        this.attackBehavior(player);
+        this.attackBehavior(time, player);
       } else if (distance <= this.chargeTriggerDistance && distance >= this.chargeMinDistance) {
         // 在合适的距离范围内发起冲锋
         this.startCharge(player);
@@ -556,8 +558,8 @@ class WildBoar extends Enemy {
     
     this.isCharging = false;
     
-    // 停止移动
-    this.sprite.setVelocity(0);
+    // 停止水平移动，保持重力对Y轴的影响
+    this.sprite.body.setVelocityX(0);
     
     // 冲锋结束后短暂眩晕（如果还活着）
     if (this.health > 0 && this.currentState !== this.states.DIE) {
@@ -697,9 +699,11 @@ class WildBoar extends Enemy {
       this.playSound('hurt');
       
       // 野猪受伤时可能会停止冲锋，但不进入眩晕状态
-      if (this.isCharging && Math.random() < 0.3) {
+      // 降低冲锋中断概率，避免过早停止冲锋
+      if (this.isCharging && Math.random() < 0.1) {
         this.isCharging = false;
-        this.sprite.setVelocity(0);
+        // 停止水平移动，保持重力对Y轴的影响
+        this.sprite.body.setVelocityX(0);
         
         // 触发冲锋停止事件
         EventBus.emit('enemy-charge-stop', {
@@ -737,8 +741,8 @@ class WildBoar extends Enemy {
     // 设置死亡状态
     this.setState(this.states.DIE);
     
-    // 停止所有移动
-    this.sprite.setVelocity(0);
+    // 停止水平移动，保持重力对Y轴的影响
+    this.sprite.body.setVelocityX(0);
     
     // 播放死亡动画
     this.playAnimation('die', () => {

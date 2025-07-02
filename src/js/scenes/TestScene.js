@@ -453,7 +453,9 @@ this.load.spritesheet('items', 'assets/images/items/items_spritesheet.png', {
   createControls() {
     // 创建并初始化输入管理器
     this.inputManager = new InputManager(this);
-    this.inputManager.init();
+    // 获取玩家职业类型，默认为warrior
+    const playerClass = this.player?.characterType || 'warrior';
+    this.inputManager.init(playerClass);
   }
 
   update(time, delta) {

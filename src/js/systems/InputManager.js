@@ -3,6 +3,8 @@
  * 负责管理游戏中的所有输入控制，包括键盘、鼠标等
  */
 
+import { getCharacterConfig } from '../data/CharacterConfig.js';
+
 class InputManager {
   /**
    * 构造函数
@@ -12,23 +14,26 @@ class InputManager {
     this.scene = scene;
     this.cursors = null; // 方向键
     this.actionKeys = {}; // 动作键（攻击、跳跃等）
+    this.skillKeys = {}; // 技能键映射
     this.eventListeners = []; // 事件监听器列表
+    this.playerClass = null; // 玩家职业
   }
 
   /**
    * 初始化输入管理器
+   * @param {string} playerClass - 玩家职业类型
    */
-  init() {
+  init(playerClass = 'warrior') {
+    this.playerClass = playerClass;
+    
     // 创建方向键
     this.cursors = this.scene.input.keyboard.createCursorKeys();
     
     // 创建攻击键
     this.actionKeys.attack = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     
-    // 创建技能键
-    this.actionKeys.heavySlash = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-    this.actionKeys.whirlwind = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-    this.actionKeys.battleCry = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    // 动态创建技能键
+    this.initSkillKeys();
     
     // 创建暂停键
     this.actionKeys.pause = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
@@ -37,6 +42,32 @@ class InputManager {
     });
     
     return this;
+  }
+
+  /**
+   * 初始化技能键映射
+   */
+  initSkillKeys() {
+    const config = getCharacterConfig(this.playerClass);
+    if (!config || !config.skillKeyMappings) {
+      console.warn(`No skill key mappings found for class: ${this.playerClass}`);
+      return;
+    }
+
+    // 清空现有技能键
+    this.skillKeys = {};
+
+    // 根据配置创建技能键
+    Object.entries(config.skillKeyMappings).forEach(([keyCode, skillInfo]) => {
+      const phaserKeyCode = Phaser.Input.Keyboard.KeyCodes[keyCode];
+      if (phaserKeyCode) {
+        this.skillKeys[keyCode] = {
+          key: this.scene.input.keyboard.addKey(phaserKeyCode),
+          skillId: skillInfo.skillId,
+          methodName: skillInfo.methodName
+        };
+      }
+    });
   }
 
   /**
@@ -67,31 +98,34 @@ class InputManager {
     }
     
     // 处理技能输入
-    if (this.actionKeys.heavySlash && Phaser.Input.Keyboard.JustDown(this.actionKeys.heavySlash)) {
-      if (this.scene.player.heavySlash && typeof this.scene.player.heavySlash === 'function') {
-        const skillUsed = this.scene.player.heavySlash();
-        if (skillUsed) {
-          console.log('Heavy Slash skill activated');
+    this.handleSkillInputs();
+  }
+
+  /**
+   * 处理技能输入
+   */
+  handleSkillInputs() {
+    Object.entries(this.skillKeys).forEach(([keyCode, skillInfo]) => {
+      if (Phaser.Input.Keyboard.JustDown(skillInfo.key)) {
+        const player = this.scene.player;
+        if (player && player[skillInfo.methodName] && typeof player[skillInfo.methodName] === 'function') {
+          const skillUsed = player[skillInfo.methodName]();
+          if (skillUsed) {
+            console.log(`${skillInfo.methodName} skill activated`);
+          }
         }
       }
-    }
-    
-    if (this.actionKeys.whirlwind && Phaser.Input.Keyboard.JustDown(this.actionKeys.whirlwind)) {
-      if (this.scene.player.whirlwind && typeof this.scene.player.whirlwind === 'function') {
-        const skillUsed = this.scene.player.whirlwind();
-        if (skillUsed) {
-          console.log('Whirlwind skill activated');
-        }
-      }
-    }
-    
-    if (this.actionKeys.battleCry && Phaser.Input.Keyboard.JustDown(this.actionKeys.battleCry)) {
-      if (this.scene.player.battleCry && typeof this.scene.player.battleCry === 'function') {
-        const skillUsed = this.scene.player.battleCry();
-        if (skillUsed) {
-          console.log('Battle Cry skill activated');
-        }
-      }
+    });
+  }
+
+  /**
+   * 更新玩家职业（当玩家切换职业时调用）
+   * @param {string} newPlayerClass - 新的玩家职业
+   */
+  updatePlayerClass(newPlayerClass) {
+    if (this.playerClass !== newPlayerClass) {
+      this.playerClass = newPlayerClass;
+      this.initSkillKeys();
     }
   }
 
